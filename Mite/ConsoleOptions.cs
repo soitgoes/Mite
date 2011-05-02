@@ -18,7 +18,7 @@ namespace Mite
                 //TODO:  Check to see if the options contained and notify that the option is not set.
                 if (dictionary.ContainsKey(key) && !string.IsNullOrEmpty(dictionary[key]))
                     return dictionary[key];
-                Console.WriteLine(string.Format("Options '{0}' has not been set", key));
+                //Console.WriteLine(string.Format("Options '{0}' has not been set", key));
                 return "";
             }
             set
@@ -29,5 +29,16 @@ namespace Mite
         }
         //TODO : handle invalid option gracefully
         public string PathToMigrationScripts { get { return this["-p"]; } }
+
+        public string DestinationVersion { get
+        {
+            if (dictionary.ContainsKey("-d"))
+            {
+                return dictionary["-d"];
+            }else
+            {
+                return null;
+            }
+        }}
     }
 }
