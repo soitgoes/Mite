@@ -21,7 +21,7 @@ namespace Mite
 
         public List<Migration> GetScripts(string currentVersion, string destinationVersion)
         {
-          
+            return null;
         }
     }
 }

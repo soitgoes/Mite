@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -15,6 +16,16 @@ namespace Mite
         public string MigrationTable { get { return migrationTable; } set { migrationTable = value; } }
         private readonly IDbConnection connection;
         private readonly string scriptDirectory;
+        private string pathToOsql;
+        private bool hasOsql = false;
+
+        public Migrator(string pathToOsql, string configLocation, string scriptDirectory)
+        {
+            this.configLocation = configLocation;
+            this.pathToOsql = pathToOsql;
+            this.scriptDirectory = scriptDirectory;
+            this.hasOsql = true;
+        }
 
         public Migrator(IDbConnection connection, string scriptDirectory)
         {
@@ -47,28 +58,33 @@ namespace Mite
             int scriptsExecuted = 0;
             string lastVersion = currentVersion;
             var allScripts = GetScripts(currentVersion, destinationVersion, direction);
+            var scripts = allScripts.AsQueryable();
+                   
             for (int i=0 ; i< allScripts.Count ; i++)
             {
-                var scripts = allScripts.AsQueryable().ElementAt(i);
-                string script = scripts.Value;
-                Console.WriteLine("\tExecuting Script: " + scripts.Key);
-                foreach (var sql in script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                var script = scripts.ElementAt(i);
+                if ((direction == MigrationType.Down && destinationVersion != script.Key) || direction == MigrationType.Up)
                 {
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = sql;
-                        cmd.ExecuteNonQuery();
+                    Console.WriteLine("\tExecuting {0} Script: " + script.Key, direction);
+                    if (hasOsql) {
+                        Environment.CurrentDirectory = scriptDirectory;
+                        var process = new Process();
+                        var info = new ProcessStartInfo(pathToOsql, script.Key);
+                        info.RedirectStandardOutput = true;
+                        process.StartInfo = info;
+                        process.Start();
+                    } else {
+                        foreach (var sql in script.Value.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries)) {
+                            using (var cmd = connection.CreateCommand()) {
+                                cmd.CommandText = sql;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
                     }
+                    scriptsExecuted++;
                 }
-                if (direction == MigrationType.Down)
-                {
-                    SetCurrentVersion(allScripts.AsQueryable().ElementAt(i+1).Key);    
-                }else
-                {
-                    SetCurrentVersion(scripts.Key);    
-                }
-                lastVersion = scripts.Key;                
-                scriptsExecuted++;
+                SetCurrentVersion(script.Key);
+              lastVersion = script.Key;                
             }
             Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
             return lastVersion;
@@ -131,7 +147,7 @@ namespace Mite
         {
             using (var cmd = connection.CreateCommand())
             {
-                cmd.CommandText = string.Format("select top 1 migration_key from {0} order by migration_key desc",
+                cmd.CommandText = string.Format("select top 1 migration_key from {0} order by id desc",
                                                 migrationTable);
                 var tmp = cmd.ExecuteScalar();
                 return tmp == null ? "" : tmp.ToString();
@@ -184,11 +200,6 @@ namespace Mite
                         END";
                 cmd.ExecuteNonQuery();
             }
-            //using (var cmd = connection.CreateCommand())
-            //{
-            //    cmd.CommandText = string.Format("INSERT INTO {0} VALUES ('0000', getDate())", migrationTable);
-            //    cmd.ExecuteNonQuery();
-            //}
         }
 
         public void Dispose()
