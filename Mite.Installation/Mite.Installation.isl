@@ -52,7 +52,7 @@
 	<summary>
 		<codepage>1252</codepage>
 		<title>Installation Database</title>
-		<subject/>
+		<subject></subject>
 		<author>InstallShield</author>
 		<keywords>Installer,MSI,Database</keywords>
 		<comments>Contact:  Your local administrator</comments>
@@ -3851,7 +3851,7 @@
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>312457355</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>312457355</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td/><td>0</td><td/><td>312459403</td></row>
-		<row><td>ID_STRING2</td><td>1033</td><td>=-Path</td><td>0</td><td/><td>312445099</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>*=-Path</td><td>0</td><td/><td>446677684</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>[~];[INSTALLDIR]</td><td>0</td><td/><td>312420555</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td/><td>0</td><td/><td>312426699</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>http://whiteboard-it.com</td><td>0</td><td/><td>312441099</td></row>
