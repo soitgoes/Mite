@@ -13,7 +13,6 @@ namespace Mite
 
         static void Main(string[] args)
         {
-
             if (args.Length == 0)
             {
                 Console.WriteLine("You must specify an option.  See /? for details");
@@ -40,8 +39,8 @@ namespace Mite
             if (args[0] == "-c")
             {
                 if (!EnforceConfig()) return;
-                CreateMigration(MigrationType.Up);
                 CreateMigration(MigrationType.Down);
+                CreateMigration(MigrationType.Up);
                 return;
             }
             if (args[0] == "init")
@@ -150,7 +149,7 @@ namespace Mite
         {
             var executingDirectory = Environment.CurrentDirectory; //todo: ensure this is correct when executed.
             var now = DateTime.Now;
-            var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("hh-mm-ss") + "Z";
+            var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
             var fileName = baseName + string.Format("-{0}.sql", typeOfMigration.ToString().ToLower());
             var fullPath = executingDirectory + "\\" + fileName;
             File.WriteAllText(fileName, string.Format("/* put your {0} sql schema migration script here and then save.*/", typeOfMigration));

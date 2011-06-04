@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 
 namespace Mite
 {
@@ -42,10 +43,13 @@ namespace Mite
         {
             if (currentVersion.CompareTo(destinationVersion) == 0) //nothing to do
                 return "nothing to do";
+            var direction = destinationVersion.CompareTo(currentVersion) > 0 ? MigrationType.Up : MigrationType.Down;
             int scriptsExecuted = 0;
             string lastVersion = currentVersion;
-            foreach (var scripts in GetScripts(currentVersion, destinationVersion))
+            var allScripts = GetScripts(currentVersion, destinationVersion, direction);
+            for (int i=0 ; i< allScripts.Count ; i++)
             {
+                var scripts = allScripts.AsQueryable().ElementAt(i);
                 string script = scripts.Value;
                 Console.WriteLine("\tExecuting Script: " + scripts.Key);
                 foreach (var sql in script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
@@ -56,9 +60,15 @@ namespace Mite
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
-                lastVersion = scripts.Key;
-                SetCurrentVersion(scripts.Key);
+                if (direction == MigrationType.Down)
+                {
+                    SetCurrentVersion(allScripts.AsQueryable().ElementAt(i+1).Key);    
+                }else
+                {
+                    SetCurrentVersion(scripts.Key);    
+                }
+                lastVersion = scripts.Key;                
+                scriptsExecuted++;
             }
             Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
             return lastVersion;
@@ -127,23 +137,31 @@ namespace Mite
                 return tmp == null ? "" : tmp.ToString();
             }
         }
-        public Dictionary<string, string> GetScripts(string currentVersion, string destinationVersion)
+        public Dictionary<string, string> GetScripts(string currentVersion, string destinationVersion, MigrationType direction)
         {
-            var postFix = destinationVersion.CompareTo(currentVersion) < 0 ? "-up" : "-down";
-            var upScripts = new Dictionary<string, string>();
-            var files = Directory.GetFiles(scriptDirectory, "*.sql");
+            var postFix = "-" + direction.ToString().ToLower();
+            var scripts = new Dictionary<string, string>();
+            IEnumerable<string> files = new List<string>(Directory.GetFiles(scriptDirectory, "*.sql"));
+            if (direction == MigrationType.Down)
+                files = files.OrderByDescending(y => y);
             foreach (var file in files)
             {
                 var fi = new FileInfo(file);
-                string version = fi.Name.Replace("-up", "").Replace(".sql", "");
-                bool isGreaterThanCurrent = string.Compare(version, currentVersion) > 0;
-                bool isLessThanDestination = string.Compare(version, destinationVersion) < 0;
-                if (fi.Name.Contains("-up") && isGreaterThanCurrent && isLessThanDestination)
+                string version = fi.Name.Replace(postFix, "").Replace(".sql", "");
+                if (fi.Name.Contains(postFix))
                 {
-                    upScripts.Add(version, File.ReadAllText(fi.Name));
+                    bool isGreaterThanCurrent = string.Compare(version, currentVersion) > 0;
+                    bool isLessThanDestination = string.Compare(version, destinationVersion) < 0;
+                    if (direction == MigrationType.Up && isGreaterThanCurrent && isLessThanDestination)
+                    {
+                        scripts.Add(version, File.ReadAllText(fi.Name));    
+                    }else if (direction == MigrationType.Down && !isLessThanDestination && !isGreaterThanCurrent)
+                    {
+                        scripts.Add(version, File.ReadAllText(fi.Name));    
+                    }
                 }
-            }
-            return upScripts;
+            }            
+            return scripts;
         }
 
 
