@@ -7,12 +7,13 @@ namespace Mite.Core
         public static MigrationContainer ReadFromDirectory(string directoryName)
         {
             var container = new MigrationContainer();
-            var files = Directory.GetFiles("*.sql");
+            var files = Directory.GetFiles(directoryName,  "*.sql");
             foreach (var file in files)
             {
                 var sql = File.ReadAllText(file);
-                var type = file.Contains("-up") ? MigrationType.Up : MigrationType.Down;
-                var version = file.Replace("-up", "").Replace("-down", "").Replace(".sql", "");
+                var info = new FileInfo(file);
+                var type = info.Name.Contains("-up") ? MigrationType.Up : MigrationType.Down;
+                var version = info.Name.Replace("-up", "").Replace("-down", "").Replace(".sql", "");
                 container.Add(new Migration(version, type, sql));
             }
             return container;
