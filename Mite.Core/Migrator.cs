@@ -71,6 +71,7 @@ namespace Mite.Core {
                 }
                 scriptsExecuted++;
             }
+            SetCurrentVersion(plan.DestinationVersion);
             Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
             return plan.DestinationVersion;
         }
