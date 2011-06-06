@@ -10,8 +10,7 @@ namespace Mite {
     class Program {
         private static string miteConfigPath = Environment.CurrentDirectory + "\\mite.config";
 
-        static void Main(string[] args)
-        {
+        static void Main(string[] args) {
 
             if (args.Length == 0) {
                 Console.WriteLine("You must specify an option.  See /? for details");
@@ -42,30 +41,31 @@ namespace Mite {
                 CreateMigration(MigrationType.Up);
                 return;
             }
+            if (args[0] == "init") {
+
+                if (args.Length != 2) {
+                    Console.WriteLine("init requires one argument, the connection string of the database");
+                    return;
+                }
+                if (CheckConnection(args[1])) {
+                    File.WriteAllText(miteConfigPath, args[1]);
+                } else {
+                    return;
+                }
+
+                Console.WriteLine("Created _migrations table");
+                using (var migrator = new Migrator(miteConfigPath, Environment.CurrentDirectory)) {
+                    migrator.CreateMigrationTableIfNotExists();
+                    var version = CreateMigration(MigrationType.Up);
+                    migrator.SetCurrentVersion(version);
+                }
+                return;
+            }
 
             using (var migrator = hasOsql
                                    ? new Migrator(pathToOsql, miteConfigPath, Environment.CurrentDirectory)
                                    : new Migrator(miteConfigPath, Environment.CurrentDirectory)) {
-                if (args[0] == "init") {
-                    if (args.Length != 2) {
-                        Console.WriteLine("init requires one argument, the connection string of the database");
-                        return;
-                    }
-                    if (CheckConnection(args[1])) {
-                        File.WriteAllText(miteConfigPath, args[1]);
-                    } else {
-                        return;
-                    }
 
-                    Console.WriteLine("Created _migrations table");
-
-
-                    migrator.CreateMigrationTableIfNotExists();
-                    var version = CreateMigration(MigrationType.Up);
-                    migrator.SetCurrentVersion(version);
-
-                    return;
-                }
 
                 if (!EnforceConfig()) return;
                 string resultingVersion = "";
@@ -140,5 +140,5 @@ namespace Mite {
 
 
     }
-  
+
 }
