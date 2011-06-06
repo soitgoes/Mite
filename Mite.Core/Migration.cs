@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mite
+namespace Mite.Core
 {
     public class Migration : IComparable
     {
@@ -22,5 +22,9 @@ namespace Mite
         {
             return ((Migration) obj).Version.CompareTo(this.Version); //string comparison works fine for ISO8611
         }
+    }
+    public enum MigrationType {
+        Up,
+        Down
     }
 }

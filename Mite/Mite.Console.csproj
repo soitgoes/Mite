@@ -52,14 +52,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleOptions.cs" />
-    <Compile Include="Migration.cs" />
-    <Compile Include="MigrationContainer.cs" />
-    <Compile Include="MigrationHelper.cs" />
-    <Compile Include="Migrator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Mite.Core\Mite.Core.csproj">
+      <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
+      <Name>Mite.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

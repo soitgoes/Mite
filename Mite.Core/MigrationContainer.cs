@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Mite
+namespace Mite.Core
 {
     public class MigrationContainer : List<Migration>
     {
@@ -12,7 +12,7 @@ namespace Mite
         public MigrationPlan GetMigrationPlan(string currentVersion, string destinationVersion)
         {
             var plan = new MigrationPlan();
-            currentVersion = string.IsNullOrEmpty(currentVersion) ? 0 : currentVersion;
+            currentVersion = string.IsNullOrEmpty(currentVersion) ? "0" : currentVersion;
             plan.OriginVersion = currentVersion;
             var greatestVersion = this.OrderByDescending(x => x.Version).FirstOrDefault().Version;
             plan.DestinationVersion = greatestVersion.CompareTo(destinationVersion) < 0 ? greatestVersion : destinationVersion; //TODO: change if greater than all 

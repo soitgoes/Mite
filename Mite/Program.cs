@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Mite.Core;
 
 namespace Mite {
     class Program {
@@ -142,8 +143,5 @@ namespace Mite {
 
 
     }
-    public enum MigrationType {
-        Up,
-        Down
-    }
+  
 }

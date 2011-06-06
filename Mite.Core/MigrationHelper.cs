@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Mite
+namespace Mite.Core
 {
     public static class MigrationHelper
     {
