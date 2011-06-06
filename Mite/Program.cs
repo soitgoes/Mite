@@ -12,10 +12,7 @@ namespace Mite {
 
         static void Main(string[] args)
         {
-#if (DEBUG)
-            Console.WriteLine("Press Any Key to Continue...");
-            Console.ReadLine();
-#endif
+
             if (args.Length == 0) {
                 Console.WriteLine("You must specify an option.  See /? for details");
                 return;

@@ -53,7 +53,7 @@ namespace Mite.Core {
             var plan = migrations.GetMigrationPlan(currentVersion, destinationVersion);
             var allScripts = plan.SqlToExecute;
             foreach (var script in allScripts) {
-                Console.WriteLine("\tExecuting {0} Script: " + script, direction);
+                //Console.WriteLine("\tExecuting {0} Script: \n\n" + script, direction);
                 if (hasOsql) {
                     Environment.CurrentDirectory = scriptDirectory;
                     var process = new Process();
