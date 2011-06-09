@@ -28,6 +28,8 @@ namespace Mite {
                 Console.WriteLine("update\tRuns all migrations greater than the current version");
                 Console.WriteLine("-c\tCreates and launches the new migration files");
                 // Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
+                Console.WriteLine("stepup\texecutes one migration file greater than the current version");
+                Console.WriteLine("stepdown\texecutes one migration file less than the current version");
                 Console.WriteLine(
                     "init Creates and opens the initial up file and makes.  Creates the _migrations table and makes and entry into the _migrations table for the initial up.");
                 return;
