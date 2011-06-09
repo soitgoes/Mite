@@ -10,8 +10,8 @@ namespace Mite {
     class Program {
         private static string miteConfigPath = Environment.CurrentDirectory + "\\mite.config";
 
-        static void Main(string[] args) {
-
+        static void Main(string[] args)
+        {
             if (args.Length == 0) {
                 Console.WriteLine("You must specify an option.  See /? for details");
                 return;
@@ -34,7 +34,7 @@ namespace Mite {
             }
             string pathToOsql = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                                              "Microsoft SQL Server", "100", "Tools", "Binn", "OSQL.EXE");
-            bool hasOsql = false;//File.Exists(pathToOsql);
+            bool hasOsql = false; // File.Exists(pathToOsql);
             if (args[0] == "-c") {
                 if (!EnforceConfig()) return;
                 CreateMigration(MigrationType.Down);
@@ -68,13 +68,23 @@ namespace Mite {
 
 
                 if (!EnforceConfig()) return;
-                string resultingVersion = "";
+                MigrationResult resultingVersion = null;
                 switch (args[0]) {
                     case "update":
                         resultingVersion = migrator.MigrateTo("999");
                         break;
                     case "-d":
                         resultingVersion = migrator.MigrateTo(args[1]);
+                        break;
+                    case "stepdown":
+                        resultingVersion = migrator.StepDown();
+                        break; 
+                    case "stepup":
+                        resultingVersion = migrator.StepUp();
+                        break;
+                    case "version":
+                        Console.WriteLine("Database Version: " +migrator.GetCurrentVersion());
+                        return;
                         break;
                     case "scratch":
                         //drop all the tables and run all migrations
@@ -88,7 +98,10 @@ namespace Mite {
                         }
                         return;
                 }
-                Console.WriteLine("Current Database Version: " + resultingVersion);
+                if (resultingVersion != null)
+                {
+                    Console.WriteLine(resultingVersion.Message);    
+                }
             }
         }
 

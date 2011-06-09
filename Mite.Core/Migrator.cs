@@ -37,17 +37,16 @@ namespace Mite.Core {
             this.connection.Open();
         }
 
-        public string MigrateTo(string destinationVersion) {
+        public MigrationResult MigrateTo(string destinationVersion) {
             //if the table does exists then create it
             CreateMigrationTableIfNotExists();
             string currentVersion = GetCurrentVersion();
             return MigrateFrom(currentVersion, destinationVersion);
         }
 
-        private string MigrateFrom(string currentVersion, string destinationVersion) {
+        private MigrationResult MigrateFrom(string currentVersion, string destinationVersion) {
             if (currentVersion.CompareTo(destinationVersion) == 0) //nothing to do
-                return "nothing to do";
-            var direction = destinationVersion.CompareTo(currentVersion) > 0 ? MigrationType.Up : MigrationType.Down;
+                return new MigrationResult(false, "Database is already at destination version"); ;
             int scriptsExecuted = 0;
             var migrations = MigrationHelper.ReadFromDirectory(Environment.CurrentDirectory);
             var plan = migrations.GetMigrationPlan(currentVersion, destinationVersion);
@@ -73,7 +72,7 @@ namespace Mite.Core {
             }
             SetCurrentVersion(plan.DestinationVersion);
             Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
-            return plan.DestinationVersion;
+            return new MigrationResult(true,  plan.OriginVersion, plan.DestinationVersion);
         }
 
         public void SetCurrentVersion(string currentVersion) {
@@ -152,5 +151,20 @@ namespace Mite.Core {
         public void Dispose() {
             connection.Dispose();
         }
+
+        public MigrationResult StepDown()
+        {
+            var version = GetCurrentVersion();
+            Migration destination= MigrationHelper.ReadFromDirectory(this.scriptDirectory).Where(x=> x.Version.CompareTo(version) <= 0).OrderBy(x => x.Version).FirstOrDefault();
+            var destinationVersion = destination== null ? version : destination.Version;
+            return this.MigrateTo(destinationVersion);
+        }
+        public MigrationResult StepUp()
+        {
+            var version = GetCurrentVersion();
+            Migration destination = MigrationHelper.ReadFromDirectory(this.scriptDirectory).Where(x => x.Version.CompareTo(version) > 0).OrderBy(x => x.Version).FirstOrDefault();
+            var destinationVersion = destination == null ? version : destination.Version;
+            return this.MigrateTo(destinationVersion);
+        } 
     }
 }
