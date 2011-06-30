@@ -47,38 +47,40 @@ namespace Mite.Core {
             return MigrateFrom(currentVersion, destinationVersion);
         }
 
-        private MigrationResult MigrateFrom(string currentVersion, string destinationVersion) {
-            if (currentVersion.CompareTo(destinationVersion) == 0) //nothing to do
-                return new MigrationResult(false, "Database is already at destination version"); ;
-            int scriptsExecuted = 0;
-            var migrations = MigrationHelper.ReadFromDirectory(Environment.CurrentDirectory);
-            var plan = migrations.GetMigrationPlan(currentVersion, destinationVersion);
-            var allScripts = plan.SqlToExecute;
-            foreach (var script in allScripts) {
-                //Console.WriteLine("\tExecuting {0} Script: \n\n" + script, direction);
-                if (hasOsql) {
-                    Environment.CurrentDirectory = scriptDirectory;
-                    var process = new Process();
-                    var info = new ProcessStartInfo(pathToOsql, script);
-                    info.RedirectStandardOutput = true;
-                    process.StartInfo = info;
-                    process.Start();
-                } else {
-                    foreach (var sql in script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries)) {
-                        using (var cmd = connection.CreateCommand()) {
-                            cmd.CommandText = sql;
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-                scriptsExecuted++;
-            }
-            if (plan.SqlToExecute.Length > 0)
-            {
-              SetCurrentVersion(plan.DestinationVersion, plan.SqlToExecute.Last());  
-            }
-            Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
-            return new MigrationResult(true,  plan.OriginVersion, plan.DestinationVersion);
+        private MigrationResult MigrateFrom(string currentVersion, string destinationVersion)
+        {
+            return null;
+            //if (currentVersion.CompareTo(destinationVersion) == 0) //nothing to do
+            //    return new MigrationResult(false, "Database is already at destination version"); ;
+            //int scriptsExecuted = 0;
+            //var migrations = MigrationHelper.ReadFromDirectory(Environment.CurrentDirectory);
+            //var plan = migrations.GetMigrationPlan(currentVersion, destinationVersion);
+            //var allScripts = plan.SqlToExecute;
+            //foreach (var script in allScripts) {
+            //    //Console.WriteLine("\tExecuting {0} Script: \n\n" + script, direction);
+            //    if (hasOsql) {
+            //        Environment.CurrentDirectory = scriptDirectory;
+            //        var process = new Process();
+            //        var info = new ProcessStartInfo(pathToOsql, script);
+            //        info.RedirectStandardOutput = true;
+            //        process.StartInfo = info;
+            //        process.Start();
+            //    } else {
+            //        foreach (var sql in script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries)) {
+            //            using (var cmd = connection.CreateCommand()) {
+            //                cmd.CommandText = sql;
+            //                cmd.ExecuteNonQuery();
+            //            }
+            //        }
+            //    }
+            //    scriptsExecuted++;
+            //}
+            //if (plan.SqlToExecute.Length > 0)
+            //{
+            //  SetCurrentVersion(plan.DestinationVersion, plan.SqlToExecute.Last());  
+            //}
+            //Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
+            //return new MigrationResult(true,  plan.OriginVersion, plan.DestinationVersion);
         }
 
         public void SetCurrentVersion(string currentVersion, string sql)

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Mite.Core;
-using Microsoft.SqlServer.Management.Smo;
+
 
 namespace Mite.MsSql
 {
