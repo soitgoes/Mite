@@ -33,6 +33,7 @@ namespace Mite.Core {
             this.configLocation = configLocation;
             this.scriptDirectory = scriptDirectory;
             this.connectionString = File.ReadAllText(configLocation);
+            //TODO: change so that the provider is specified in the mite.config so that it can be cross database compatible.
             this.connection = new SqlConnection(connectionString);
             this.connection.Open();
         }

@@ -14,7 +14,8 @@ namespace Mite.Core
             var plan = new MigrationPlan();
             currentVersion = string.IsNullOrEmpty(currentVersion) ? "0" : currentVersion;
             plan.OriginVersion = currentVersion;
-            var greatestVersion = this.OrderByDescending(x => x.Version).FirstOrDefault().Version;
+            var greatestMigration = this.OrderByDescending(x => x.Version).FirstOrDefault();
+            var greatestVersion = greatestMigration == null ? "" : greatestMigration.Version;
             plan.DestinationVersion = greatestVersion.CompareTo(destinationVersion) < 0 ? greatestVersion : destinationVersion; //TODO: change if greater than all 
             var direction = currentVersion.CompareTo(destinationVersion) > 0 ? MigrationType.Down : MigrationType.Up;
             if (direction == MigrationType.Up)
