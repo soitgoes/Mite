@@ -20,6 +20,10 @@ namespace Mite {
                 Console.WriteLine("Mite Version " + Assembly.GetExecutingAssembly().GetName().Version);
                 return;
             }
+#if DEBUG
+          Console.WriteLine("Stopped in order to attach debugger.");
+          Console.ReadLine();
+#endif
             if (args[0] == "/?") {
                 Console.WriteLine("Options are as follows:");
                 Console.WriteLine("-v\tReturns the current version of Mite");
@@ -59,7 +63,7 @@ namespace Mite {
                 using (var migrator = new Migrator(miteConfigPath, Environment.CurrentDirectory)) {
                     migrator.CreateMigrationTableIfNotExists();
                     var version = CreateMigration(MigrationType.Up);
-                    migrator.SetCurrentVersion(version);
+                    migrator.SetCurrentVersion(version, "");
                 }
                 return;
             }

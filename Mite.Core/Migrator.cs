@@ -5,6 +5,8 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Mite.Core {
     public class Migrator : IDisposable {
@@ -71,15 +73,21 @@ namespace Mite.Core {
                 }
                 scriptsExecuted++;
             }
-            SetCurrentVersion(plan.DestinationVersion);
+            if (plan.SqlToExecute.Length > 0)
+            {
+              SetCurrentVersion(plan.DestinationVersion, plan.SqlToExecute.Last());  
+            }
             Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
             return new MigrationResult(true,  plan.OriginVersion, plan.DestinationVersion);
         }
 
-        public void SetCurrentVersion(string currentVersion) {
+        public void SetCurrentVersion(string currentVersion, string sql)
+        {
+          var crypto = new SHA1CryptoServiceProvider();
+          var hash = Convert.ToBase64String(crypto.ComputeHash(Encoding.UTF8.GetBytes(sql)));
             using (var cmd = connection.CreateCommand()) {
-                cmd.CommandText = string.Format("insert into {0} VALUES ('{1}', getDate())",
-                                                migrationTable, currentVersion);
+              cmd.CommandText = string.Format("insert into {0} ([migration_key], [hash], [performed]) VALUES ('{1}', '{2}', getDate())",
+                                                migrationTable, currentVersion, hash);
                 var tmp = cmd.ExecuteNonQuery();
             }
         }
@@ -105,7 +113,8 @@ namespace Mite.Core {
                     cmd.CommandText = "create database " + database;
                     cmd.ExecuteNonQuery();
                 }
-                SetCurrentVersion("");
+              //TODO complete.
+                //SetCurrentVersion("", );
                 this.MigrateTo("999");
 
             }
@@ -138,6 +147,7 @@ namespace Mite.Core {
                         CREATE TABLE [dbo].[_migrations](
 	                        [id] [int] IDENTITY(1,1) NOT NULL,
 	                        [migration_key] [nvarchar](50) NOT NULL,
+                            [hash] [nvarchar](50) NOT NULL,
 	                        [performed] [datetime] NOT NULL,
                          CONSTRAINT [PK__migrations] PRIMARY KEY CLUSTERED 
                         (
