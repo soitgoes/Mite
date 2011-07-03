@@ -7,22 +7,22 @@ namespace Mite.Core
     public class Migration : IComparable
     {
         private readonly string version;
-        private readonly MigrationType type;
-        private readonly string sql;
+        private readonly string upSql;
+        private readonly string downSql;
         private readonly string hash;
 
-        public Migration(string version, MigrationType type, string sql)
+        public Migration(string version, string upSql, string downSql)
         {
             this.version = version;
-            this.type = type;
-            this.sql = sql;
+            this.upSql = upSql;
+            this.downSql = downSql;
             var crypto = new SHA1CryptoServiceProvider();
-            this.hash = Convert.ToBase64String(crypto.ComputeHash(Encoding.UTF8.GetBytes(sql))); 
+            this.hash = Convert.ToBase64String(crypto.ComputeHash(Encoding.UTF8.GetBytes(upSql + downSql))); 
         }
         public string Hash { get { return hash; } }
         public string Version { get { return version; } }
-        public string Sql { get { return sql; } }
-        public MigrationType Type { get { return this.type; } }
+        public string UpSql { get { return upSql; } }
+        public string DownSql { get { return downSql; } }
         public int CompareTo(object obj)
         {
             var comparable = (Migration) obj;
@@ -30,9 +30,5 @@ namespace Mite.Core
                 return 0;
             return (comparable).Version.CompareTo(this.Version); //string comparison works fine for ISO8611
         }
-    }
-    public enum MigrationType {
-        Up,
-        Down
     }
 }

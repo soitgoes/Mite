@@ -11,7 +11,7 @@ namespace Mite.Core
         }
         public MigrationPlan GetMigrationPlan(string currentVersion, string destinationVersion)
         {
-            var plan = new MigrationPlan();
+            /*var plan = new MigrationPlan();
             currentVersion = string.IsNullOrEmpty(currentVersion) ? "0" : currentVersion;
             plan.OriginVersion = currentVersion;
             var greatestMigration = this.OrderByDescending(x => x.Version).FirstOrDefault();
@@ -24,7 +24,7 @@ namespace Mite.Core
                 plan.SqlToExecute =
                     this.Where(
                         x => x.Type == MigrationType.Up && (x.Version.CompareTo(currentVersion) > 0 && x.Version.CompareTo(destinationVersion) <= 0)).OrderBy(x =>x.Version).
-                        Select(x => x.Sql).ToArray();                
+                        Select(x => x.UpSql).ToArray();                
             }else
             {
                 //get all the down scripts equal to or less than the origin and greater than the destination\
@@ -33,10 +33,13 @@ namespace Mite.Core
                         x =>
                         x.Type == MigrationType.Down &&
                         (x.Version.CompareTo(currentVersion) <= 0 && x.Version.CompareTo(destinationVersion) > 0)).
-                        OrderByDescending(x => x.Version).Select(x => x.Sql).ToArray();
+                        OrderByDescending(x => x.Version).Select(x => x.UpSql).ToArray();
             }
 
             return plan;
+             */
+            return new MigrationPlan();
+            
         }
         
     }

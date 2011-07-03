@@ -49,7 +49,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +68,10 @@
     <ProjectReference Include="..\Mite.Core\Mite.Core.csproj">
       <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
       <Name>Mite.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mite.MsSql\Mite.MsSql.csproj">
+      <Project>{129F8613-60B3-4D61-8147-723C130E6978}</Project>
+      <Name>Mite.MsSql</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

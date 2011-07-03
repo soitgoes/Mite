@@ -1,17 +1,52 @@
-﻿using Mite.Core;
+﻿using System.Collections.Generic;
+using Mite.Core;
+
 using NUnit.Framework;
 
 namespace Mite.Test
 {
     [TestFixture]
-    public class MigrationHelperTestFixture
+    public class MiteDatabaseTestFixture
     {
         [SetUp]
         public void Setup()
         {
             
         }
-              
+        [Test]
+        public void ShouldBeValidStateIfAllHashesAreTheSame()
+        {
+            var migrations = new[] {new Migration("2006", "asdf", ""), new Migration("2007", "fdsa", "")};
+            var hash = new Dictionary<string, string>();
+            foreach ( var mig in migrations)
+                hash.Add(mig.Version, mig.Hash);
+            var db = new MiteDatabase(migrations, hash);
+            Assert.IsTrue(db.IsValidState());
+        }
+        [Test]
+        public void ShouldNotBeValidStateIfAnyHashIsDifferent()
+        {
+            var migrations = new[] { new Migration("2006", "asdf", ""), new Migration("2007", "fdsa", "") };
+            var hash = new Dictionary<string, string>();
+            foreach (var mig in migrations)
+                hash.Add(mig.Version, mig.Hash);
+            hash["2006"] = "222";
+            var db = new MiteDatabase(migrations, hash);
+            Assert.IsFalse(db.IsValidState());
+        }
+        [Test]
+        public void ShouldNotBeValidIfThereIsAMigrationGap()
+        {
+            var migrations = new List<Migration> { new Migration("2006", "asdf", ""), new Migration("2007", "fdsa", "") };
+            var hash = new Dictionary<string, string>();
+            foreach (var mig in migrations)
+                hash.Add(mig.Version, mig.Hash);
+            migrations.Insert(1, new Migration("2006-01", "fdsw", ""));
+            var db = new MiteDatabase(migrations, hash);
+            Assert.IsFalse(db.IsValidState());
+        }
+
+              /*
         [Test]
         public void UpMigrationWorksIfPartialDateString()
         {
@@ -46,5 +81,6 @@ namespace Mite.Test
             var plan = container.GetMigrationPlan(null, "3000");
             Assert.AreEqual(plan.SqlToExecute , new[] {"1", "2", "3", "4"});
         }
+               */
     }
 }

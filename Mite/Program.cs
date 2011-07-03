@@ -3,12 +3,15 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Mite.Core;
+using Mite.MsSql;
 
 namespace Mite {
     class Program {
         private static string miteConfigPath = Environment.CurrentDirectory + "\\mite.config";
+        private static IMiteDatabaseRepository repo;
 
         static void Main(string[] args)
         {
@@ -41,10 +44,10 @@ namespace Mite {
             string pathToOsql = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                                              "Microsoft SQL Server", "100", "Tools", "Binn", "OSQL.EXE");
             bool hasOsql = false; // File.Exists(pathToOsql);
+            
             if (args[0] == "-c") {
                 if (!EnforceConfig()) return;
-                CreateMigration(MigrationType.Down);
-                CreateMigration(MigrationType.Up);
+                CreateMigration();
                 return;
             }
             if (args[0] == "init") {
@@ -53,20 +56,21 @@ namespace Mite {
                     Console.WriteLine("init requires one argument, the connection string of the database");
                     return;
                 }
-                if (CheckConnection(args[1])) {
+                repo = new MiteMsSqlDatabaseRepository(args[1], Environment.CurrentDirectory);
+                if (repo.CheckConnection()) {
                     File.WriteAllText(miteConfigPath, args[1]);
                 } else {
                     return;
                 }
 
                 Console.WriteLine("Created _migrations table");
-                using (var migrator = new Migrator(miteConfigPath, Environment.CurrentDirectory)) {
-                    migrator.CreateMigrationTableIfNotExists();
-                    var version = CreateMigration(MigrationType.Up);
-                    migrator.SetCurrentVersion(version, "");
-                }
+                repo.Init();
                 return;
             }
+            repo = new MiteMsSqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
+            var database = repo.Create();
+            var migrations = database.UnexcutedMigrations();
+
 
             using (var migrator = hasOsql
                                    ? new Migrator(pathToOsql, miteConfigPath, Environment.CurrentDirectory)
@@ -75,12 +79,47 @@ namespace Mite {
 
                 if (!EnforceConfig()) return;
                 MigrationResult resultingVersion = null;
+                var unexecuted = database.UnexcutedMigrations();
                 switch (args[0]) {
                     case "update":
-                        resultingVersion = migrator.MigrateTo("999");
+                        if ( database.IsValidState())
+                        {
+                            foreach (var migToExe in unexecuted)
+                            {
+                                Console.WriteLine("Executing migration " + migToExe.Version);
+                                repo.ExecuteUp(migToExe);
+                            }
+                        }                      
                         break;
                     case "-d":
                         resultingVersion = migrator.MigrateTo(args[1]);
+                        break;
+                    case "status":
+                        if (database.IsHashMismatch())
+                        {
+                            if (migrations.Count() == 0)
+                            {
+                                Console.WriteLine("No migrations to execute");
+                                return;
+                            }
+                        }else
+                        {
+                            var invalidMigrations = database.InvalidMigrations();
+                            Console.WriteLine("The following versions are invalid:");
+                            foreach ( var mig in invalidMigrations)
+                            {
+                                Console.WriteLine(mig.Version);
+                            }
+                            return ;
+                        }
+                             
+                        Console.WriteLine("Unexecuted Migrations:");
+                        foreach ( var mig in migrations)
+                        {
+                            Console.WriteLine(mig.Version);
+                        }
+                        return;
+                        //todo return the status 
                         break;
                     case "stepdown":
                         resultingVersion = migrator.StepDown();
@@ -115,43 +154,26 @@ namespace Mite {
             string connString = string.Empty;
             try {
                 connString = GetConnString();
+                return true;
             } catch (FileNotFoundException fnf) {
                 Console.WriteLine("mite.config expected in current directory");
 
                 return false;
             }
-            if (!CheckConnection(connString)) {
-                return false;
-            }
-            return true;
         }
 
         private static string GetConnString() {
             return File.ReadAllText(miteConfigPath);
         }
 
-        private static bool CheckConnection(string connString) {
-            try {
-                using (var testConn = new SqlConnection(connString)) {
-                    testConn.Open();
-                    testConn.Close();
-                }
-                return true;
-            } catch (Exception ex) {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine("Invalid Connection string.  Specify in mite.config or with mite init");
-                return false;
-            }
 
-        }
-
-        private static string CreateMigration(MigrationType typeOfMigration) {
+        private static string CreateMigration() {
             var executingDirectory = Environment.CurrentDirectory; //todo: ensure this is correct when executed.
             var now = DateTime.Now;
             var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
-            var fileName = baseName + string.Format("-{0}.sql", typeOfMigration.ToString().ToLower());
+            var fileName = baseName + ".sql";
             var fullPath = executingDirectory + "\\" + fileName;
-            File.WriteAllText(fileName, string.Format("/* put your {0} sql schema migration script here and then click save.*/", typeOfMigration));
+            File.WriteAllText(fileName, "/* up */\n\n/* down */");
             Console.WriteLine("Creating file '{0}'", fullPath);
             Process.Start(fullPath);
             return baseName;
