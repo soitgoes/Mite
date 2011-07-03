@@ -8,176 +8,120 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Mite.Core {
-    public class Migrator : IDisposable {
-        private readonly string configLocation;
-        private readonly string connectionString;
-        private static string migrationTable = "_migrations";
-        public string MigrationTable { get { return migrationTable; } set { migrationTable = value; } }
-        private readonly IDbConnection connection;
-        private readonly string scriptDirectory;
-        private string pathToOsql;
-        private bool hasOsql = false;
+namespace Mite.Core
+{
+    public class Migrator
+    {
+        private IMiteDatabase database;
+        private readonly IMiteDatabaseRepository databaseRepository;
 
-        public Migrator(string pathToOsql, string configLocation, string scriptDirectory) {
-            this.configLocation = configLocation;
-            this.pathToOsql = pathToOsql;
-            this.scriptDirectory = scriptDirectory;
-            this.hasOsql = true;
-        }
-
-        public Migrator(IDbConnection connection, string scriptDirectory) {
-            this.connection = connection;
-            this.scriptDirectory = scriptDirectory;
-            this.connection.Open();
-        }
-        public Migrator(string configLocation, string scriptDirectory) {
-            this.configLocation = configLocation;
-            this.scriptDirectory = scriptDirectory;
-            this.connectionString = File.ReadAllText(configLocation);
-            //TODO: change so that the provider is specified in the mite.config so that it can be cross database compatible.
-            this.connection = new SqlConnection(connectionString);
-            this.connection.Open();
-        }
-
-        public MigrationResult MigrateTo(string destinationVersion) {
-            //if the table does exists then create it
-            CreateMigrationTableIfNotExists();
-            string currentVersion = GetCurrentVersion();
-            return MigrateFrom(currentVersion, destinationVersion);
-        }
-
-        private MigrationResult MigrateFrom(string currentVersion, string destinationVersion)
+        public Migrator(IMiteDatabase database, IMiteDatabaseRepository databaseRepository)
         {
-            return null;
-            //if (currentVersion.CompareTo(destinationVersion) == 0) //nothing to do
-            //    return new MigrationResult(false, "Database is already at destination version"); ;
-            //int scriptsExecuted = 0;
-            //var migrations = MigrationHelper.ReadFromDirectory(Environment.CurrentDirectory);
-            //var plan = migrations.GetMigrationPlan(currentVersion, destinationVersion);
-            //var allScripts = plan.SqlToExecute;
-            //foreach (var script in allScripts) {
-            //    //Console.WriteLine("\tExecuting {0} Script: \n\n" + script, direction);
-            //    if (hasOsql) {
-            //        Environment.CurrentDirectory = scriptDirectory;
-            //        var process = new Process();
-            //        var info = new ProcessStartInfo(pathToOsql, script);
-            //        info.RedirectStandardOutput = true;
-            //        process.StartInfo = info;
-            //        process.Start();
-            //    } else {
-            //        foreach (var sql in script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries)) {
-            //            using (var cmd = connection.CreateCommand()) {
-            //                cmd.CommandText = sql;
-            //                cmd.ExecuteNonQuery();
-            //            }
-            //        }
-            //    }
-            //    scriptsExecuted++;
-            //}
-            //if (plan.SqlToExecute.Length > 0)
-            //{
-            //  SetCurrentVersion(plan.DestinationVersion, plan.SqlToExecute.Last());  
-            //}
-            //Console.WriteLine("Number of scripts executed: " + scriptsExecuted);
-            //return new MigrationResult(true,  plan.OriginVersion, plan.DestinationVersion);
+            this.database = database;
+            this.databaseRepository = databaseRepository;
         }
 
-        public void SetCurrentVersion(string currentVersion, string sql)
-        {
-          var crypto = new SHA1CryptoServiceProvider();
-          var hash = Convert.ToBase64String(crypto.ComputeHash(Encoding.UTF8.GetBytes(sql)));
-            using (var cmd = connection.CreateCommand()) {
-              cmd.CommandText = string.Format("insert into {0} ([migration_key], [hash], [performed]) VALUES ('{1}', '{2}', getDate())",
-                                                migrationTable, currentVersion, hash);
-                var tmp = cmd.ExecuteNonQuery();
-            }
-        }
-
-        public void Cleanup() {
-            File.Delete(configLocation); //Delete the configuration file
-            //drop the _migrations table
-            DropMigrationTable();
-        }
-        public void FromScratch() {
-            //close connection
-            this.connection.Close();
-            using (var scratchConnection = new SqlConnection(connectionString.Replace(connection.Database, "master"))) {
-                //drop the database
-                var database = this.connection.Database;
-                scratchConnection.Open();
-                using (var cmd = scratchConnection.CreateCommand()) {
-                    cmd.CommandText = "drop database " + database;
-                    cmd.ExecuteNonQuery();
-                }
-                //create the database
-                using (var cmd = this.connection.CreateCommand()) {
-                    cmd.CommandText = "create database " + database;
-                    cmd.ExecuteNonQuery();
-                }
-              //TODO complete.
-                //SetCurrentVersion("", );
-                this.MigrateTo("999");
-
-            }
-
-        }
-
-        private void DropMigrationTable() {
-            using (var cmd = connection.CreateCommand()) {
-                cmd.CommandText = string.Format("drop table {0}",
-                                                migrationTable);
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        public string GetCurrentVersion() {
-            using (var cmd = connection.CreateCommand()) {
-                cmd.CommandText = string.Format("select top 1 migration_key from {0} order by id desc",
-                                                migrationTable);
-                var tmp = cmd.ExecuteScalar();
-                return tmp == null ? "" : tmp.ToString();
-            }
-        }
-
-
-        public void CreateMigrationTableIfNotExists() {
-            using (var cmd = connection.CreateCommand()) {
-                //TODO replace with ANSI sql for broader compatibility
-                cmd.CommandText = @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_migrations]') AND type in (N'U'))
-                        BEGIN
-                        CREATE TABLE [dbo].[_migrations](
-	                        [id] [int] IDENTITY(1,1) NOT NULL,
-	                        [migration_key] [nvarchar](50) NOT NULL,
-                            [hash] [nvarchar](50) NOT NULL,
-	                        [performed] [datetime] NOT NULL,
-                         CONSTRAINT [PK__migrations] PRIMARY KEY CLUSTERED 
-                        (
-	                        [id] ASC
-                        )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-                        ) ON [PRIMARY]
-                        END";
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        public void Dispose() {
-            connection.Dispose();
-        }
-
-        public MigrationResult StepDown()
-        {
-            var version = GetCurrentVersion();
-            Migration destination= MigrationHelper.ReadFromDirectory(this.scriptDirectory).Where(x=> x.Version.CompareTo(version) <= 0).OrderBy(x => x.Version).FirstOrDefault();
-            var destinationVersion = destination== null ? version : destination.Version;
-            return this.MigrateTo(destinationVersion);
-        }
         public MigrationResult StepUp()
         {
-            var version = GetCurrentVersion();
-            Migration destination = MigrationHelper.ReadFromDirectory(this.scriptDirectory).Where(x => x.Version.CompareTo(version) > 0).OrderBy(x => x.Version).FirstOrDefault();
-            var destinationVersion = destination == null ? version : destination.Version;
-            return this.MigrateTo(destinationVersion);
-        } 
+            if (database.IsValidState())
+            {
+                var version = this.database.Version;
+                var firstMigration = this.database.UnexcutedMigrations.FirstOrDefault();
+                databaseRepository.ExecuteUp(firstMigration);
+                return new MigrationResult(true, version, firstMigration.Version);
+            }
+            else
+            {
+                throw new Exception("Database must be in a valid state before executing a StepUp");
+            }
+        }
+        public MigrationResult StepDown()
+        {
+            if (!database.IsValidState())
+                throw new Exception("Database must be in a valid state before executing a StepDown");
+            var key = this.database.Version;
+            IDictionary<string, Migration> migrationDictionary = this.database.GetMigrationDictionary();
+            var migration = migrationDictionary[key];
+            var resultingVersion =
+                migrationDictionary.Keys.Where(x => x.CompareTo(key) < 0).OrderByDescending(x => x).FirstOrDefault();
+            var resultingMigration = migrationDictionary[resultingVersion];
+            databaseRepository.ExecuteDown(migration);
+            return new MigrationResult(true, key, resultingMigration.Version);
+        }
+
+        public void FromScratch()
+        {
+            //delete execute all downs that are in the database  then execute the ups.
+            foreach (var mig in database.ExecutedMigrations)
+            {
+                databaseRepository.ExecuteDown(mig);
+            }
+            foreach (var mig in database.GetMigrationDictionary().Values)
+            {
+                databaseRepository.ExecuteUp(mig);
+            }
+        }
+        public MigrationResult SafeResolution()
+        {
+            var version = database.Version;
+            MigrateTo(database.LastValidMigration.Version);
+            Update();
+            database = databaseRepository.Create();
+            return new MigrationResult(true,version, database.Version );
+        }
+        public MigrationResult DirtyResolution()
+        {
+            //run all non-executed transactions
+            var version = database.Version;
+            foreach (var mig in database.UnexcutedMigrations)
+            {
+                databaseRepository.ExecuteUp(mig);
+            }
+            database = databaseRepository.Create();
+            return new MigrationResult(true, version, database.Version);
+        }
+        public MigrationResult Update()
+        {
+            if (!database.IsValidState())
+                throw new Exception("Database must be in a valid state in order to update it.");
+            var version = database.Version;
+            foreach (var mig in database.UnexcutedMigrations)
+            {
+                databaseRepository.ExecuteUp(mig);
+            }
+            database = databaseRepository.Create();
+            return new MigrationResult(true, "", version, database.Version);
+        }
+
+        public MigrationResult MigrateTo(string destinationVersion)
+        {
+            if (!database.IsValidState())
+                throw new Exception(
+                    "Database must be in a valid state in order to use migrate to.  Try mite update instead.");
+            string originalVersion = database.Version;
+            bool isUp = database.Version.CompareTo(destinationVersion) > 0;
+            Migration lastMigration = null;
+            if (isUp)
+            {
+                var migrationsToExecute =
+                    database.UnexcutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) <= 0);
+                foreach (var mig in migrationsToExecute)
+                {
+                    databaseRepository.ExecuteUp(mig);
+                }
+            }
+            else
+            {
+                var migrationsToExecute =
+                    database.ExecutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) > 0);
+                foreach (var mig in migrationsToExecute)
+                {
+                    databaseRepository.ExecuteDown(mig);
+                }
+            }
+
+            this.database = databaseRepository.Create();
+            return new MigrationResult(true, "", originalVersion, database.Version);
+        }
     }
 }

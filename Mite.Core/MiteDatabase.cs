@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,23 +8,23 @@ namespace Mite.Core
     /// <summary>
     /// Item which computes which scripts have been run and not run
     /// </summary>
-    public class MiteDatabase
+    public class MiteDatabase : IMiteDatabase
     {
         private readonly IList<Migration> migrations;
         private readonly IDictionary<string, string> hashes;
 
-        public MiteDatabase(IList<Migration> migrations, IDictionary<string, string> hashes)
+        public MiteDatabase(IEnumerable<Migration> migrations, IDictionary<string, string> hashes)
         {
             this.migrations = migrations.OrderBy(x => x.Version).ToList();
             this.hashes = hashes;
         }
         public IEnumerable<Migration> MigrationsSince(DateTime dateTime)
         {
-            return UnexcutedMigrations().Where(x => x.Version.CompareTo(dateTime.ToIso()) > 0);
+            return UnexcutedMigrations.Where(x => x.Version.CompareTo(dateTime.ToIso()) > 0);
         }
-        public IEnumerable<Migration> UnexcutedMigrations()
+        public IEnumerable<Migration> UnexcutedMigrations
         {
-            return migrations.Where(x => !hashes.Values.Contains(x.Hash)).OrderBy(x => x.Version);
+            get { return migrations.Where(x => !hashes.Values.Contains(x.Hash)).OrderBy(x => x.Version); }
         }
         public bool IsHashMismatch()
         {
@@ -37,6 +38,15 @@ namespace Mite.Core
                 }
             }
             return true;
+        }
+        public IDictionary<string , Migration> GetMigrationDictionary()
+        {
+            var dict = new Dictionary<string, Migration>();
+            foreach (var mig in this.migrations)
+            {
+                dict.Add(mig.Version, mig);
+            }
+            return dict;
         }
         public bool IsMigrationGap()
         {
@@ -57,8 +67,25 @@ namespace Mite.Core
         public bool IsValidState()
         {
             return !IsMigrationGap() && IsHashMismatch();
+        } 
+
+        public Migration LastValidMigration
+        {
+            get
+            {
+                Migration lastValidMigration = null;
+                foreach (var mig in migrations)
+                {
+                    if (hashes[mig.Version] == mig.Version)
+                    {
+                        return lastValidMigration;
+                    }
+                    lastValidMigration = mig;
+                }
+                return lastValidMigration;
+            }
         }
-        
+
         public IEnumerable<Migration> InvalidMigrations()
         {
             foreach (var mig in migrations)
@@ -67,6 +94,20 @@ namespace Mite.Core
                 if (hash != mig.Hash)
                     yield return mig;
             }
+        }
+
+        public string Version
+        {
+            get { var lastKey = hashes.Keys.LastOrDefault();
+            if (lastKey == null)
+                return string.Empty;
+                return lastKey;
+            }
+        }
+
+        public IEnumerable<Migration> ExecutedMigrations
+        {
+            get { return migrations.Where(x => hashes.Values.Contains(x.Version)).OrderByDescending(x => x.Version); }
         }
     }
 }

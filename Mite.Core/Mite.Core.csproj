@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DateTimeExtensionMethods.cs" />
+    <Compile Include="IMiteDatabase.cs" />
     <Compile Include="IMiteDatabaseRepository.cs" />
     <Compile Include="IScriptGenerator.cs" />
     <Compile Include="Migration.cs" />

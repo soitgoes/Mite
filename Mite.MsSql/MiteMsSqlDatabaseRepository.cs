@@ -104,7 +104,6 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
                     cmd.CommandText = sql;
                     cmd.ExecuteNonQuery();
                 }
-
                 
                 var migrationCmd = connection.CreateCommand();
                 migrationCmd.Transaction = trans;
@@ -123,10 +122,13 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                var cmd = connection.CreateCommand();
-                cmd.Transaction = trans;
-                cmd.CommandText = migration.DownSql;
-                cmd.ExecuteNonQuery();
+                foreach (var sql in migration.DownSql.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var cmd = connection.CreateCommand();
+                    cmd.Transaction = trans;
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+                }
 
                 var migrationCmd = connection.CreateCommand();
                 migrationCmd.Transaction = trans;
@@ -153,6 +155,15 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             {
                 connection.Close();
             }
+        }
+
+        public void DropMigrationTable()
+        {
+            this.connection.Open();
+            var cmd = this.connection.CreateCommand();
+            cmd.CommandText = string.Format("drop table {0}", tableName);
+            cmd.ExecuteNonQuery();
+            this.connection.Close();
         }
 
 

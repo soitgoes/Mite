@@ -69,17 +69,13 @@ namespace Mite {
             }
             repo = new MiteMsSqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
             var database = repo.Create();
-            var migrations = database.UnexcutedMigrations();
+            var migrations = database.UnexcutedMigrations;
 
-
-            using (var migrator = hasOsql
-                                   ? new Migrator(pathToOsql, miteConfigPath, Environment.CurrentDirectory)
-                                   : new Migrator(miteConfigPath, Environment.CurrentDirectory)) {
-
-
+            var migrator = new Migrator(database, repo);
+           
                 if (!EnforceConfig()) return;
                 MigrationResult resultingVersion = null;
-                var unexecuted = database.UnexcutedMigrations();
+                var unexecuted = database.UnexcutedMigrations;
                 switch (args[0]) {
                     case "update":
                         if ( database.IsValidState())
@@ -95,7 +91,7 @@ namespace Mite {
                         resultingVersion = migrator.MigrateTo(args[1]);
                         break;
                     case "status":
-                        if (database.IsHashMismatch())
+                        if (database.IsValidState())
                         {
                             if (migrations.Count() == 0)
                             {
@@ -104,13 +100,31 @@ namespace Mite {
                             }
                         }else
                         {
-                            var invalidMigrations = database.InvalidMigrations();
-                            Console.WriteLine("The following versions are invalid:");
-                            foreach ( var mig in invalidMigrations)
+                            if ( database.IsHashMismatch())
                             {
-                                Console.WriteLine(mig.Version);
+                                var invalidMigrations = database.InvalidMigrations();
+                                Console.WriteLine("The following migrations don't match their checksums:");
+                                foreach (var mig in invalidMigrations)
+                                {
+                                    Console.WriteLine(mig.Version);
+                                }
+                                return;    
+                            }else if (database.IsMigrationGap())
+                            {
+                                Console.WriteLine("There is a gap in your migrations how would you like to resolve it?");
+                                Console.WriteLine("safe: down(s) first then ups");
+                                Console.WriteLine("dirty: only the ups");
+                                var resolution = Console.ReadLine();
+                                if (resolution == "safe")
+                                {
+                                    
+                                }else if (resolution == "dirty")
+                                {
+                                    
+                                }
+
                             }
-                            return ;
+                            
                         }
                              
                         Console.WriteLine("Unexecuted Migrations:");
@@ -119,7 +133,6 @@ namespace Mite {
                             Console.WriteLine(mig.Version);
                         }
                         return;
-                        //todo return the status 
                         break;
                     case "stepdown":
                         resultingVersion = migrator.StepDown();
@@ -128,7 +141,7 @@ namespace Mite {
                         resultingVersion = migrator.StepUp();
                         break;
                     case "version":
-                        Console.WriteLine("Database Version: " +migrator.GetCurrentVersion());
+                        Console.WriteLine("Database Version: " +database.Version);
                         return;
                         break;
                     case "scratch":
@@ -138,7 +151,8 @@ namespace Mite {
                     case "clean":
                         Console.WriteLine("This will remove the mite.config and drop the _migrations table.  Are you sure you would like to clean (y/n)?");
                         if (Console.ReadLine() == "y") {
-                            migrator.Cleanup();
+                            repo.DropMigrationTable();
+                            File.Delete(Path.Combine(Environment.CurrentDirectory, "mite.config"));
                             Console.WriteLine("mite cleaned successfully");
                         }
                         return;
@@ -147,7 +161,7 @@ namespace Mite {
                 {
                     Console.WriteLine(resultingVersion.Message);    
                 }
-            }
+            
         }
 
         private static bool EnforceConfig() {
