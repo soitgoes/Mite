@@ -124,24 +124,24 @@ namespace Mite.Test
             var db = new MiteDatabase(migrations, hashes);
             Assert.IsFalse(db.IsMigrationGap());
         }
-        [Test]
-        public void DownMigrationShouldExecuteToVersionSpecified()
-        {
-            var migrations = new List<Migration> { 
-                new Migration("2006", "asdf", ""), 
-                new Migration("2006-01", "98sd98", ""), 
-                new Migration("2007", "fdsa", "") };
-            var hashes = new Dictionary<string, string>();
-            foreach (var mig in migrations)
-                hashes.Add(mig.Version, mig.Hash);
-            var db = new MiteDatabase(migrations, hashes);
-            var repoMock = new Mock<IMiteDatabaseRepository>();
-            int y = 0;
-            repoMock.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Returns(db).Callback(() => { y++; });
-            var migrator = new Migrator(db, repoMock.Object);
-            migrator.MigrateTo("2006");
-            Assert.AreEqual(y, 2);
-        }
+        //[Test]
+        //public void DownMigrationShouldExecuteToVersionSpecified()
+        //{
+        //    var migrations = new List<Migration> { 
+        //        new Migration("2006", "asdf", ""), 
+        //        new Migration("2006-01", "98sd98", ""), 
+        //        new Migration("2007", "fdsa", "") };
+        //    var hashes = new Dictionary<string, string>();
+        //    foreach (var mig in migrations)
+        //        hashes.Add(mig.Version, mig.Hash);
+        //    var db = new MiteDatabase(migrations, hashes);
+        //    var repoMock = new Mock<IMiteDatabaseRepository>();
+        //    int y = 0;
+        //    repoMock.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Returns(db).Callback(() => { y++; });
+        //    var migrator = new Migrator(db, repoMock.Object);
+        //    migrator.MigrateTo("2006");
+        //    Assert.AreEqual(y, 2);
+        //}
         [Test]
         public void AnEmptyHashListShouldReturnFalseForInvalidHash()
         {

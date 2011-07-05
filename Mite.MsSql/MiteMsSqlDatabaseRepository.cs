@@ -60,9 +60,14 @@ GO
 COMMIT
 select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_Perms_By_Name(N'dbo._migrations', 'Object', 'VIEW DEFINITION') as View_def_Per, Has_Perms_By_Name(N'dbo._migrations', 'Object', 'CONTROL') as Contr_Per";
 
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = migrationTableScript;
-            cmd.ExecuteNonQuery();
+            this.connection.Open();
+            foreach (var sql in migrationTableScript.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+            }
+            this.connection.Close();
             return Create();
         }
 
