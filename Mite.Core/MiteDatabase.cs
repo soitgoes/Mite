@@ -16,7 +16,7 @@ namespace Mite.Core
         public MiteDatabase(IEnumerable<Migration> migrations, IDictionary<string, string> hashes)
         {
             this.migrations = migrations.OrderBy(x => x.Version).ToList();
-            this.hashes = hashes;
+            this.hashes = hashes ?? new Dictionary<string, string>();
         }
         public IEnumerable<Migration> MigrationsSince(DateTime dateTime)
         {
@@ -24,7 +24,7 @@ namespace Mite.Core
         }
         public IEnumerable<Migration> UnexcutedMigrations
         {
-            get { return migrations.Where(x => !hashes.Values.Contains(x.Hash)).OrderBy(x => x.Version); }
+            get { return migrations.Where(x => !hashes.ContainsKey(x.Version)).OrderBy(x => x.Version); }
         }
         public bool IsHashMismatch()
         {
@@ -34,10 +34,10 @@ namespace Mite.Core
                 if (hashes.ContainsKey(mig.Version))
                 {
                     if (mig.Hash != hashes[mig.Version])
-                        return false;    
+                        return true;    
                 }
             }
-            return true;
+            return false;
         }
         public IDictionary<string , Migration> GetMigrationDictionary()
         {
@@ -66,7 +66,7 @@ namespace Mite.Core
 
         public bool IsValidState()
         {
-            return !IsMigrationGap() && IsHashMismatch();
+            return !IsMigrationGap() && !IsHashMismatch();
         } 
 
         public Migration LastValidMigration
@@ -76,11 +76,15 @@ namespace Mite.Core
                 Migration lastValidMigration = null;
                 foreach (var mig in migrations)
                 {
-                    if (hashes[mig.Version] == mig.Version)
+                    if (hashes.ContainsKey(mig.Version) && hashes[mig.Version] == mig.Hash)
+                    {
+                        lastValidMigration = mig;
+                        
+                    }else
                     {
                         return lastValidMigration;
                     }
-                    lastValidMigration = mig;
+                   
                 }
                 return lastValidMigration;
             }
@@ -90,15 +94,21 @@ namespace Mite.Core
         {
             foreach (var mig in migrations)
             {
-                var hash = hashes[mig.Version];
-                if (hash != mig.Hash)
-                    yield return mig;
+                if (hashes.ContainsKey(mig.Version))
+                {
+                    var hash = hashes[mig.Version];
+                    if (hash != mig.Hash)
+                        yield return mig;    
+                }
             }
         }
 
         public string Version
         {
-            get { var lastKey = hashes.Keys.LastOrDefault();
+            get {
+                if (hashes.Count == 0)
+                    return "0";
+                var lastKey = hashes.Keys.LastOrDefault();
             if (lastKey == null)
                 return string.Empty;
                 return lastKey;
@@ -107,7 +117,7 @@ namespace Mite.Core
 
         public IEnumerable<Migration> ExecutedMigrations
         {
-            get { return migrations.Where(x => hashes.Values.Contains(x.Version)).OrderByDescending(x => x.Version); }
+            get { return migrations.Where(x => hashes.ContainsKey(x.Version)).OrderByDescending(x => x.Version); }
         }
     }
 }

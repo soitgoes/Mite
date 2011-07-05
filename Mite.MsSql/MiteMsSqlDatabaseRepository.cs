@@ -132,8 +132,8 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
 
                 var migrationCmd = connection.CreateCommand();
                 migrationCmd.Transaction = trans;
-                migrationCmd.CommandText = string.Format("delete from {0} where hash = @hash", tableName);
-                migrationCmd.Parameters.AddWithValue("@hash", migration.Hash);
+                migrationCmd.CommandText = string.Format("delete from {0} where [key] = @version", tableName);
+                migrationCmd.Parameters.AddWithValue("@version", migration.Version);
                 migrationCmd.ExecuteNonQuery();
                 trans.Commit();
             }

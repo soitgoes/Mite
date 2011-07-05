@@ -56,18 +56,21 @@ namespace Mite.Core
             {
                 databaseRepository.ExecuteDown(mig);
             }
-            foreach (var mig in database.GetMigrationDictionary().Values)
+            database = databaseRepository.Create();
+            foreach (var mig in database.UnexcutedMigrations)
             {
                 databaseRepository.ExecuteUp(mig);
             }
         }
         public MigrationResult SafeResolution()
         {
-            var version = database.Version;
-            MigrateTo(database.LastValidMigration.Version);
+            var priorVersion = database.Version;
+            var lastValidMigrationVersion = database.LastValidMigration  == null ?  "" : database.LastValidMigration.Version;
+            MigrateTo(lastValidMigrationVersion);
+            database = databaseRepository.Create();
             Update();
             database = databaseRepository.Create();
-            return new MigrationResult(true,version, database.Version );
+            return new MigrationResult(true,priorVersion, database.Version );
         }
         public MigrationResult DirtyResolution()
         {
@@ -95,12 +98,12 @@ namespace Mite.Core
 
         public MigrationResult MigrateTo(string destinationVersion)
         {
-            if (!database.IsValidState())
-                throw new Exception(
-                    "Database must be in a valid state in order to use migrate to.  Try mite update instead.");
+            
             string originalVersion = database.Version;
-            bool isUp = database.Version.CompareTo(destinationVersion) > 0;
-            Migration lastMigration = null;
+            bool isUp = database.Version.CompareTo(destinationVersion) < 0;
+            if (isUp && !database.IsValidState())
+                throw new Exception(
+                    "Database must be in a valid state in order to use migrate in the up direction.  Try mite update instead.");
             if (isUp)
             {
                 var migrationsToExecute =
