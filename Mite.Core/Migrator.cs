@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Mite.Core
 {
     public class Migrator
     {
         private IMiteDatabase database;
-        private readonly IMiteDatabaseRepository databaseRepository;
+        private readonly IDatabaseRepository databaseRepository;
 
-        public Migrator(IMiteDatabase database, IMiteDatabaseRepository databaseRepository)
+        public Migrator(IMiteDatabase database, IDatabaseRepository databaseRepository)
         {
             this.database = database;
             this.databaseRepository = databaseRepository;

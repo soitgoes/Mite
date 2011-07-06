@@ -7,15 +7,15 @@ using System.Text;
 using Mite.Core;
 namespace Mite.MsSql
 {
-    public class MiteMsSqlDatabaseRepository: IMiteDatabaseRepository
+    public class MsSqlDatabaseRepository: IDatabaseRepository
     {
         private readonly string filePath;
         private readonly string tableName;
         private readonly SqlConnection connection;
-        public MiteMsSqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
+        public MsSqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
         {            
         }
-        public MiteMsSqlDatabaseRepository(string connectionString, string filePath, string tableName)
+        public MsSqlDatabaseRepository(string connectionString, string filePath, string tableName)
         {
             this.filePath = filePath;
             this.tableName = tableName;
@@ -88,15 +88,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             connection.Close();
             return new MiteDatabase(MigrationHelper.ReadFromDirectory(filePath).ToList(), hashes);
         }
-        public string GetCurrentVersion ()
-        {
-            connection.Open();
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = string.Format("select top 1 key from {0} order by key desc", tableName);
-            var version = cmd.ExecuteScalar().ToString();
-            connection.Close();
-            return version;
-        }
+       
         public MiteDatabase ExecuteUp(Migration migration)
         {
             connection.Open();

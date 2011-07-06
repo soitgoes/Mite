@@ -2,7 +2,7 @@
 
 namespace Mite.Core
 {
-    public interface  IMiteDatabaseRepository :IDisposable
+    public interface  IDatabaseRepository :IDisposable
     {
         MiteDatabase Init();
         MiteDatabase Create();

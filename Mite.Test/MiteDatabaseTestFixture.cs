@@ -80,7 +80,7 @@ namespace Mite.Test
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
             var db = new MiteDatabase(migrations, hash);
-            var repoMoq = new Moq.Mock<IMiteDatabaseRepository>();
+            var repoMoq = new Moq.Mock<IDatabaseRepository>();
             int y = 0;
             repoMoq.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Callback((Migration input) => { y++; });
             repoMoq.Setup(x => x.Create()).Returns(db);
@@ -135,7 +135,7 @@ namespace Mite.Test
         //    foreach (var mig in migrations)
         //        hashes.Add(mig.Version, mig.Hash);
         //    var db = new MiteDatabase(migrations, hashes);
-        //    var repoMock = new Mock<IMiteDatabaseRepository>();
+        //    var repoMock = new Mock<IDatabaseRepository>();
         //    int y = 0;
         //    repoMock.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Returns(db).Callback(() => { y++; });
         //    var migrator = new Migrator(db, repoMock.Object);

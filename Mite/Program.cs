@@ -7,13 +7,14 @@ using System.Linq;
 using System.Reflection;
 using Mite.Core;
 using Mite.MsSql;
+using Mite.MySql;
 
 namespace Mite
 {
     class Program
     {
         private static string miteConfigPath = Environment.CurrentDirectory + "\\mite.config";
-        private static IMiteDatabaseRepository repo;
+        private static IDatabaseRepository repo;
 
         static void Main(string[] args)
         {
@@ -64,13 +65,15 @@ namespace Mite
                     Console.WriteLine("init requires one argument, the connection string of the database");
                     return;
                 }
-                repo = new MiteMsSqlDatabaseRepository(args[1], Environment.CurrentDirectory);
+                repo = new MsSqlDatabaseRepository(args[1], Environment.CurrentDirectory);
+                //repo = new MySqlDatabaseRepository(args[1], Environment.CurrentDirectory);
                 if (repo.CheckConnection())
                 {
                     File.WriteAllText(miteConfigPath, args[1]);
                 }
                 else
                 {
+                    Console.WriteLine("Connection Invalid");
                     return;
                 }
 
@@ -78,7 +81,8 @@ namespace Mite
                 repo.Init();
                 return;
             }
-            repo = new MiteMsSqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
+            repo = new MsSqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
+            //repo = new MySqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
             var database = repo.Create();
             var migrations = database.UnexcutedMigrations;
 
@@ -221,7 +225,7 @@ namespace Mite
             var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
             var fileName = baseName + ".sql";
             var fullPath = executingDirectory + "\\" + fileName;
-            File.WriteAllText(fileName, "/* up */\n\n/* down */\n\n");
+            File.WriteAllText(fileName, "/* up */\r\n\r\n/* down */\r\n\r\n");
             Console.WriteLine("Creating file '{0}'", fullPath);
             Process.Start(fullPath);
             return baseName;
