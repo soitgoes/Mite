@@ -138,5 +138,20 @@ namespace Mite.MySql
             cmd.ExecuteNonQuery();
             this.connection.Close();
         }
+
+        public bool MigrationTableExists()
+        {
+            this.connection.Open();
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = "show tables";
+            var dr = cmd.ExecuteReader();
+            var tables = new List<string>();
+            while (dr.Read())
+            {
+                tables.Add(dr[0].ToString());
+            }
+            this.connection.Close();
+            return tables.Contains(tableName);
+        }
     }
 }

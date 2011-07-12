@@ -5,9 +5,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
+using System.Xml.Linq;
 using Mite.Core;
 using Mite.MsSql;
 using Mite.MySql;
+using Newtonsoft.Json.Linq;
 
 namespace Mite
 {
@@ -40,7 +43,7 @@ namespace Mite
                     "-d\tSpecifies the destination version to migrate to.  (can be greater than migrations available)");
                 Console.WriteLine("update\tRuns all migrations greater than the current version");
                 Console.WriteLine("-c\tCreates and launches the new migration files");
-                // Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
+                Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
                 Console.WriteLine("stepup\texecutes one migration file greater than the current version");
                 Console.WriteLine("stepdown\texecutes one migration file less than the current version");
                 Console.WriteLine(
@@ -59,6 +62,8 @@ namespace Mite
             }
             if (args[0] == "init")
             {
+                Console.WriteLine("Obsolete.   Removed");
+                return;
 
                 if (args.Length != 2)
                 {
@@ -81,8 +86,26 @@ namespace Mite
                 repo.Init();
                 return;
             }
-            repo = new MsSqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
-            //repo = new MySqlDatabaseRepository(File.ReadAllText(miteConfigPath), Environment.CurrentDirectory);
+            var configPath= Environment.CurrentDirectory + "\\mite.config";
+            var config= JObject.Parse(File.ReadAllText(configPath));
+            string connectionString = config.Value<string>("connectionString");
+            string providerName = config.Value<string>("providerName");
+            switch (providerName)
+            {
+                case "System.Data.SqlClient":
+                    repo = new MsSqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
+                    break;
+                case "MySql.Data.MySqlClient":
+                    repo = new MySqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
+                    break;
+                default:
+                    Console.WriteLine("Provider not recognized.  Please check your mite.config");
+                    break;
+            }
+            if (!repo.MigrationTableExists())
+            {
+                repo.Init();
+            }
             var database = repo.Create();
             var migrations = database.UnexcutedMigrations;
 

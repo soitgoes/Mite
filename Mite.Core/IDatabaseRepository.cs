@@ -14,5 +14,6 @@ namespace Mite.Core
         MiteDatabase ExecuteDown(Migration migration);
         bool CheckConnection();
         void DropMigrationTable();
+        bool MigrationTableExists();
     }
 }

@@ -77,7 +77,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             connection.Open();
             var cmd = connection.CreateCommand();
             cmd.CommandText = string.Format("select * from {0}", tableName);
-            Dictionary<string, string> hashes = new Dictionary<string, string>();
+            var hashes = new Dictionary<string, string>();
             using (var dr = cmd.ExecuteReader())
             {
                 while (dr.Read())
@@ -161,6 +161,21 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             cmd.CommandText = string.Format("drop table {0}", tableName);
             cmd.ExecuteNonQuery();
             this.connection.Close();
+        }
+
+        public bool MigrationTableExists()
+        {
+            this.connection.Open();
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = string.Format(@"SELECT 1 FROM sysobjects WHERE id = object_id(N'[dbo].[{0}]')", tableName);
+            var dr = cmd.ExecuteReader();
+            bool result = false;
+            if (dr.Read())
+            {
+                result = true;
+            }
+            this.connection.Close();
+            return result;
         }
 
 
