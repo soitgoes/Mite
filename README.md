@@ -52,13 +52,13 @@ Supported Platforms
 * Keep your scripts directory in a place that will not be published in a web accessible directory.  
 
 ## Migrating Up & Down
-`mite stepup`
+* `mite stepup`
 * will execute one up migration
-`mite stepdown`
+* `mite stepdown`
 * will execute one down migration
-`mite -d 2011-01-03`
+* `mite -d 2011-01-03`
 * will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
-`mite /?`
+* `mite /?`
 * will bring up the help which list all commands.
 
 The MIT License
