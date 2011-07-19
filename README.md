@@ -35,23 +35,28 @@ Supported Platforms
 *If you are working on an existing project that uses mite and you do not have a database setup yet*
 
 * make sure that you have an empty database created and that are in your scripts directory
-* mite init
-* mite update
+    mite init
+    mite update
 
 ## Creating your first migration
-* "mite -c" 
+    mite -c
 * open the file that was created and insert your up and down migration (See video for shortcut using tooling)
-* "mite update" in order to bring your database current
+    mite update
+* in order to bring your database current
 
 ## Mite Best Practices
 * Use source control.  If you keep your migration scripts in the same repository as your source then you will always have the appropriate migrations in order to make your database current for that version.
 * Keep your scripts directory in a place that will not be published in a web accessible directory.  
 
 ## Migrating Up & Down
-* "mite stepup" will execute one up migration
-* "mite stepdown" will execute one down migration
-* "mite -d 2011-01-03" will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
-* "mite /?" will bring up the help which list all commands.
+    mite stepup
+* will execute one up migration
+    mite stepdown
+* will execute one down migration
+    mite -d 2011-01-03
+* will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
+    mite /?
+* will bring up the help which list all commands.
 
 The MIT License
 
