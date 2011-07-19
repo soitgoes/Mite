@@ -4,10 +4,12 @@ The goal of Mite is to make migrations simple and painless without introducing n
 and to make doing migrations easier than not doing migrations for even the most simple project.
 
 Supported Databases
+
 * MsSql
 * MySql
 
 Supported Platforms
+
 * Any machine that can run .net or mono applications
 
 # Tenants of Mite
