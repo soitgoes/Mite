@@ -14,34 +14,36 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 # Tenants of Mite
 
-* SQL is a perfectly good DSL that developers know and already have tooling for.
+* SQL is a perfectly good DSL that developers know and already have tools for.
 * Down migrations are required for expected behavior on conflict resolution.
 * Order is significant in migrations and is enforced.
-* Migrations should be language agonostic.  So a utility should be just fine.
-* Database consistency with the migrations should be enforced.  If migrations are altered we should know about it.
+* Migrations should be language agonostic.  So a utility is appropriate.
+* Database consistency with the migrations should be enforced.  We should be aware of altered migrations.
 
 ## Getting Started with Mite on a Existing Database
 * Create a directory for your sql scripts.  For the purposes of this guide we'll use "scripts".
     `cd scripts`
     `mite init`
 
-* follow the steps in the wizard which will guide you through creating the _base.sql and mite.config
-* That's it, see "Creating your first migration"
+* Follow the steps in the wizard. It will guide you through creating the _base.sql and mite.config.
+* That's it, see "Creating your first migration".
 
 ## Getting Started with Mite on a New Project
+
 * `cd scripts`
 * `mite init`
 
 ## Inheriting A Mite Project
-*If you are working on an existing project that uses mite and you do not have a database setup yet*
+If you are working on an existing project that uses mite and you do not have a database setup yet:
 
-* make sure that you have an empty database created and are in your scripts directory
+* Make sure that you have an empty database created and are in your scripts directory.  Then execute the following commands.
 * `mite init`
 * `mite update`
 
 ## Creating your first migration
+Use the following steps:
 * `mite -c`
-* open the file that was created and insert your up and down migration (See video for shortcut using tooling)
+* Open the file that was created and insert your up and down migration (See video for shortcut using tooling).
 * `mite update`  (in order to bring your database current)
 
 ## Mite Best Practices
@@ -49,19 +51,19 @@ and to make doing migrations easier than not doing migrations for even the most 
 * Keep your scripts directory in a place that will not be published in a web accessible directory.  
 
 ## Migrating Up & Down
-* `mite stepup`  will execute one up migration
-* `mite stepdown`  will execute one down migration
-* `mite -d 2011-01-03`  will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
-* `mite /?`  will bring up the help which list all commands.
+* `mite stepup`  will execute one up migration.
+* `mite stepdown`  will execute one down migration.
+* `mite -d 2011-01-03`  will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key.
+* `mite /?`  will display the help which shows all commands.
 
 ## Installation
-* Download the distributable or Build from source
+* Download the distributable or build from source.
 * Add the location of Mite.exe to your PATH variable.
 
 ## Mono
-* Download the mono distributable or Build from source with xbuild
-* Use the instructions above but prefix everything with mite.exe.  The mono intrepreter should load it.  If not then prefix it with mono
-* `mite.exe update`
+* Download the mono distributable or build from source with xbuild.
+* Use the instructions above but use mite.exe instead of mite.  The mono intrepreter should load it.  If not then prefix it with mono
+* Example: `mite.exe update` or `mono mite.exe update`
 
 ## The MIT License
 
