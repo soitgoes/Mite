@@ -28,8 +28,8 @@ Supported Platforms
 * That's it, see "Creating your first migration"
 
 ## Getting Started with Mite on a New Project
-* cd scripts
-* mite init
+    cd scripts
+    mite init
 
 ## Inheriting A Mite Project
 *If you are working on an existing project that uses mite and you do not have a database setup yet*
