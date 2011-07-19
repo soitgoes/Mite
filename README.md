@@ -3,12 +3,12 @@
 The goal of Mite is to make migrations simple and painless without introducing new DSL syntax, file formats or xml for the developer to learn 
 and to make doing migrations easier than not doing migrations for even the most simple project.
 
-Supported Databases
+### Supported Databases
 
 * MsSql
 * MySql
 
-Supported Platforms
+### Supported Platforms
 
 * Any machine that can run .net or mono applications
 
@@ -59,7 +59,11 @@ Supported Platforms
 * `mite /?`
 * will bring up the help which list all commands.
 
-The MIT License
+## Installation
+* Download the distributable or Build from source
+* Add the location of Mite.exe to your PATH variable.
+
+## The MIT License
 
 Copyright (c) 2011 Whiteboard-IT LLC
 
