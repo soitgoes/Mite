@@ -43,7 +43,7 @@ Supported Platforms
 `mite -c`
 
 * open the file that was created and insert your up and down migration (See video for shortcut using tooling)
-`mite update`
+* `mite update`
 
 * in order to bring your database current
 
