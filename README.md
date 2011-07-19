@@ -5,7 +5,7 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 ### Supported Databases
 
-* MsSql
+* Microsoft SQL
 * MySql
 
 ### Supported Platforms
