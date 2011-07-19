@@ -35,7 +35,7 @@ and to make doing migrations easier than not doing migrations for even the most 
 ## Inheriting A Mite Project
 *If you are working on an existing project that uses mite and you do not have a database setup yet*
 
-* make sure that you have an empty database created and that are in your scripts directory
+* make sure that you have an empty database created and are in your scripts directory
 * `mite init`
 * `mite update`
 
