@@ -14,7 +14,8 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 # Tenants of Mite
 
-* SQL is a perfectly good DSL that developers know and already have tools for.
+* SQL is a perfectly good DSL (Domain Specific Language) 
+* Developers know and have tools for SQL.
 * Down migrations are required for expected behavior on conflict resolution.
 * Order is significant in migrations and is enforced.
 * Migrations should be language agonostic.  So a utility is appropriate.
