@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DateTimeExtensionMethods.cs" />
+    <Compile Include="DateTimeHelper.cs" />
     <Compile Include="IMiteDatabase.cs" />
     <Compile Include="IDatabaseRepository.cs" />
     <Compile Include="Migration.cs" />

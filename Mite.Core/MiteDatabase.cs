@@ -20,7 +20,7 @@ namespace Mite.Core
         }
         public IEnumerable<Migration> MigrationsSince(DateTime dateTime)
         {
-            return UnexcutedMigrations.Where(x => x.Version.CompareTo(dateTime.ToIso()) > 0);
+            return UnexcutedMigrations.Where(x => x.Version.CompareTo(DateTimeHelper.ToIso(dateTime)) > 0);
         }
         public IEnumerable<Migration> UnexcutedMigrations
         {
