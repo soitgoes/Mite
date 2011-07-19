@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Linq;
 using Mite.Core;
 using Mite.MsSql;
 using Mite.MySql;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Mite
@@ -50,11 +47,7 @@ namespace Mite
                     "init Creates and opens the initial up file and makes.  Creates the _migrations table and makes and entry into the _migrations table for the initial up.");
                 return;
             }
-            string pathToOsql = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                                             "Microsoft SQL Server", "100", "Tools", "Binn", "OSQL.EXE");
-            bool hasOsql = false; // File.Exists(pathToOsql);
-
-            if (args[0] == "-c")
+          if (args[0] == "-c")
             {
                 if (!EnforceConfig()) return;
                 CreateMigration();
@@ -62,46 +55,48 @@ namespace Mite
             }
             if (args[0] == "init")
             {
-                Console.WriteLine("Obsolete.   Removed");
-                return;
-
-                if (args.Length != 2)
+                Console.WriteLine("What provider are you using?");
+                Console.WriteLine("[1] MySql.Data.MsSqlClient");
+                Console.WriteLine("[2] System.Data.SqlClient");
+                string providerName = "";
+                switch (Console.ReadKey().KeyChar )
                 {
-                    Console.WriteLine("init requires one argument, the connection string of the database");
+                    case '1':
+                        providerName = "MySql.Data.MsSqlClient";
+                        break;
+                    case '2':
+                        providerName = "System.Data.SqlClient";
+                        break;
+                    default:
+                        Console.WriteLine("Option not recognized");
+                        return;
+                }
+                //determine the server
+                Console.WriteLine("Please enter you complete connection string.");
+                string connectionString = Console.ReadLine();
+
+                //determine the database
+
+                JObject obj = new JObject();
+                obj["providerName"] = providerName;
+                obj["connectionString"] = connectionString   ;
+                File.WriteAllText(Environment.CurrentDirectory + "\\mite.config", obj.ToString(Formatting.Indented));
+                repo = GetProvider(providerName, connectionString);
+                if (!repo.MigrationTableExists())
+                {
+                    repo.Init(); //create the migration table
+                }else
+                {
+                    Console.WriteLine("_migrations table already exists");
                     return;
                 }
-                repo = new MsSqlDatabaseRepository(args[1], Environment.CurrentDirectory);
-                //repo = new MySqlDatabaseRepository(args[1], Environment.CurrentDirectory);
-                if (repo.CheckConnection())
-                {
-                    File.WriteAllText(miteConfigPath, args[1]);
-                }
-                else
-                {
-                    Console.WriteLine("Connection Invalid");
-                    return;
-                }
+                //todo:generate base.sql.  make everything ignore base.sql except scratch
 
-                Console.WriteLine("Created _migrations table");
-                repo.Init();
                 return;
             }
             var configPath= Environment.CurrentDirectory + "\\mite.config";
             var config= JObject.Parse(File.ReadAllText(configPath));
-            string connectionString = config.Value<string>("connectionString");
-            string providerName = config.Value<string>("providerName");
-            switch (providerName)
-            {
-                case "System.Data.SqlClient":
-                    repo = new MsSqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
-                    break;
-                case "MySql.Data.MySqlClient":
-                    repo = new MySqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
-                    break;
-                default:
-                    Console.WriteLine("Provider not recognized.  Please check your mite.config");
-                    break;
-            }
+            repo = GetProvider(config.Value<string>("providerName"), config.Value<string>("connectionString"));
             if (!repo.MigrationTableExists())
             {
                 repo.Init();
@@ -119,6 +114,12 @@ namespace Mite
                 case "update":
                     if (database.IsValidState())
                     {
+                        if (unexecuted.Count() == 0)
+                        {
+                            Console.WriteLine("No migrations to execute");
+                            Console.WriteLine("Current Version: " + database.Version);
+                            return;
+                        }
                         foreach (var migToExe in unexecuted)
                         {
                             Console.WriteLine("Executing migration " + migToExe.Version);
@@ -180,7 +181,6 @@ namespace Mite
                         Console.WriteLine(mig.Version);
                     }
                     return;
-                    break;
                 case "stepdown":
                     resultingVersion = migrator.StepDown();
                     break;
@@ -190,7 +190,6 @@ namespace Mite
                 case "version":
                     Console.WriteLine("Database Version: " + database.Version);
                     return;
-                    break;
                 case "scratch":
                     //drop all the tables and run all migrations
                     migrator.FromScratch();
@@ -212,6 +211,23 @@ namespace Mite
             }
         }
 
+        private static IDatabaseRepository GetProvider(string providerName, string connectionString)
+        {
+            switch (providerName)
+            {
+                case "System.Data.SqlClient":
+                    repo = new MsSqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
+                    break;
+                case "MySql.Data.MySqlClient":
+                    repo = new MySqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
+                    break;
+                default:
+                    Console.WriteLine("Provider not recognized.  Please check your mite.config");
+                    break;
+            }
+            return repo;
+        }
+
         private static void Resolve(Migrator migrator)
         {
             var result = migrator.SafeResolution();
@@ -221,16 +237,14 @@ namespace Mite
 
         private static bool EnforceConfig()
         {
-            string connString = string.Empty;
             try
             {
-                connString = GetConnString();
+                GetConnString();
                 return true;
             }
-            catch (FileNotFoundException fnf)
+            catch (FileNotFoundException)
             {
                 Console.WriteLine("mite.config expected in current directory");
-
                 return false;
             }
         }
