@@ -56,18 +56,7 @@ namespace Mite
             }
             if (args[0] == "init")
             {
-                var baseFilePath = Path.Combine(Environment.CurrentDirectory, baseFileName);
-                if (File.Exists(miteConfigPath) && File.Exists(baseFilePath))
-                {
-                    Console.WriteLine("Would you like me to execute the _base.sql for you? [y|n]");
-                    var execute = Console.ReadLine();
-                    if (execute == "y")
-                    {
-                        repo.ExecuteScript(File.ReadAllText(baseFilePath));
-                        Console.WriteLine("Schema created successfully");
-                    }
-                    return;
-                }
+                
 
                 Console.WriteLine("What provider are you using?");
                 Console.WriteLine("[1] MySql.Data.MsSqlClient");
@@ -96,6 +85,16 @@ namespace Mite
                 obj["connectionString"] = connectionString   ;
                 File.WriteAllText(miteConfigPath, obj.ToString(Formatting.Indented));
                 repo = GetProvider(providerName, connectionString);
+                var baseFilePath = Path.Combine(Environment.CurrentDirectory, baseFileName);
+                if (File.Exists(miteConfigPath) && File.Exists(baseFilePath)) {
+                    Console.WriteLine("Would you like me to execute the _base.sql for you? [y|n]");
+                    var execute = Console.ReadLine();
+                    if (execute == "y") {
+                        repo.ExecuteScript(File.ReadAllText(baseFilePath));
+                        Console.WriteLine("Schema created successfully");
+                    }
+                    return;
+                }
                 if (!repo.MigrationTableExists())
                 {
                     repo.Init(); //create the migration table
