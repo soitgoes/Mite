@@ -11,6 +11,8 @@ and to make doing migrations easier than not doing migrations for even the most 
 ### Supported Platforms
 
 * Any machine that can run .net or mono applications
+* Tested with Mono 2.6.7
+* Tested with .Net 4.0
 
 # Tenants of Mite
 
