@@ -22,8 +22,8 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 ## Getting Started with Mite on a Existing Database
 * Create a directory for your sql scripts.  For the purposes of this guide we'll use "scripts".
-    cd scripts
-    mite init
+    `cd scripts`
+    `mite init`
 
 * follow the steps on the wizard which will guide you through creating your _base.sql and creating your mite.config
 * That's it, see "Creating your first migration"
