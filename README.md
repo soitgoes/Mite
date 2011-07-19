@@ -60,8 +60,8 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 ## Mono
 * Download the mono distributable or Build from source with xbuild
-* Use the instructions above but prefix everything with mono 
-* `mono mite update`
+* Use the instructions above but prefix everything with mite.exe.  The mono intrepreter should load it.  If not then prefix it with mono
+* `mite.exe update`
 
 ## The MIT License
 
