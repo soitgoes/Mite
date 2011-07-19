@@ -178,6 +178,12 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return result;
         }
 
+        public string GenerateSqlScript(bool includeData)
+        {
+            //use mysqldump to generate sql?
+            return "";
+        }
+
 
         public void Dispose()
         {

@@ -15,5 +15,6 @@ namespace Mite.Core
         bool CheckConnection();
         void DropMigrationTable();
         bool MigrationTableExists();
+        string GenerateSqlScript(bool includeData);
     }
 }

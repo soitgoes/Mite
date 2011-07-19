@@ -153,5 +153,10 @@ namespace Mite.MySql
             this.connection.Close();
             return tables.Contains(tableName);
         }
+
+        public string GenerateSqlScript(bool includeData)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
