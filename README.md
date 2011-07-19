@@ -16,7 +16,7 @@ Supported Platforms
 
 * SQL is a perfectly good DSL that developers know and already have tooling for.
 * Down migrations are required for expected behavior on conflict resolution.
-* Order is significant in migrations and is enforced
+* Order is significant in migrations and is enforced.
 * Migrations should be language agonostic.  So a utility should be just fine.
 * Database consistency with the migrations should be enforced.  If migrations are altered we should know about it.
 
@@ -29,22 +29,20 @@ Supported Platforms
 * That's it, see "Creating your first migration"
 
 ## Getting Started with Mite on a New Project
-    cd scripts
-    mite init
+* `cd scripts`
+* `mite init`
 
 ## Inheriting A Mite Project
 *If you are working on an existing project that uses mite and you do not have a database setup yet*
 
 * make sure that you have an empty database created and that are in your scripts directory
-    mite init
-    mite update
-
-## Creating your first migration
-`mite -c`
-
-* open the file that was created and insert your up and down migration (See video for shortcut using tooling)
+* `mite init`
 * `mite update`
 
+## Creating your first migration
+* `mite -c`
+* open the file that was created and insert your up and down migration (See video for shortcut using tooling)
+* `mite update`
 * in order to bring your database current
 
 ## Mite Best Practices
