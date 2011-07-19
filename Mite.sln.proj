@@ -15,7 +15,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -35,7 +34,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -55,7 +53,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x64') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -63,7 +60,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x86') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -77,7 +73,6 @@
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
@@ -100,7 +95,6 @@
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
@@ -120,7 +114,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x64') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -131,7 +124,6 @@
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
@@ -154,7 +146,6 @@
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
@@ -174,7 +165,6 @@
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
@@ -194,7 +184,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x64') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -202,7 +191,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x86') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -216,7 +204,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -239,7 +226,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -259,7 +245,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'x64') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -270,7 +255,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -284,7 +268,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -304,7 +287,6 @@
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
     </BuildLevel0>
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <BuildLevel1 Include="E:\working\Mite\Mite.Test\Mite.Test.csproj">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -324,7 +306,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x64') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -332,7 +313,6 @@
   </ItemGroup>
   <ItemGroup Condition=" ('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x86') ">
     <SkipLevel0 Include="Mite.Core" />
-    <MissingConfigLevel0 Include="Mite.Installer" />
     <SkipLevel1 Include="Mite.Test" />
     <SkipLevel1 Include="Mite.MsSql" />
     <SkipLevel1 Include="Mite.MySql" />
@@ -574,7 +554,6 @@
     <ProjectReference Include="E:\working\Mite\Mite\Mite.Console.csproj" />
     <ProjectReference Include="E:\working\Mite\Mite.Test\Mite.Test.csproj" />
     <ProjectReference Include="E:\working\Mite\Mite.Core\Mite.Core.csproj" />
-    <ProjectReference Include="E:\working\Mite\Mite.Installer\Mite.Installer.vdproj" />
     <ProjectReference Include="E:\working\Mite\Mite.MsSql\Mite.MsSql.csproj" />
     <ProjectReference Include="E:\working\Mite\Mite.MySql\Mite.MySql.csproj" />
   </ItemGroup>
@@ -994,94 +973,6 @@
     <MSBuild Projects="E:\working\Mite\Mite.Core\Mite.Core.csproj" ToolsVersion="$(ProjectToolsVersion)" Targets="Publish" Properties="Configuration=Release; Platform=AnyCPU; BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" Condition=" ('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Mixed Platforms') " />
     <Message Text="Project &quot;Mite.Core&quot; is disabled for solution configuration &quot;SingleImage|x64&quot;." Condition=" ('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x64') " />
     <Message Text="Project &quot;Mite.Core&quot; is disabled for solution configuration &quot;SingleImage|x86&quot;." Condition=" ('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x86') " />
-  </Target>
-  <Target Name="Mite_Installer" Condition="'$(CurrentSolutionConfigurationContents)' != ''" Outputs="@(CollectedBuildOutput)">
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x64' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x86' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x64' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x86' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x64' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x86' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x86')" />
-  </Target>
-  <Target Name="Mite_Installer:Clean" Condition="'$(CurrentSolutionConfigurationContents)' != ''">
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x64' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x86' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x64' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x86' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x64' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x86' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x86')" />
-  </Target>
-  <Target Name="Mite_Installer:Rebuild" Condition="'$(CurrentSolutionConfigurationContents)' != ''" Outputs="@(CollectedBuildOutput)">
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x64' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x86' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x64' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x86' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x64' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x86' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x86')" />
-  </Target>
-  <Target Name="Mite_Installer:Publish" Condition="'$(CurrentSolutionConfigurationContents)' != ''">
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x64' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'CD_ROM|x86' was not found in the solution file." Condition="('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Debug|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Debug') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x64' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'DVD-5|x86' was not found in the solution file." Condition="('$(Configuration)' == 'DVD-5') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x64' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'Release|x86' was not found in the solution file." Condition="('$(Configuration)' == 'Release') and ('$(Platform)' == 'x86')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Any CPU' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Any CPU')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|Mixed Platforms' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'Mixed Platforms')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x64' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x64')" />
-    <Warning Text="The project configuration for project 'Mite.Installer' corresponding to the solution configuration 'SingleImage|x86' was not found in the solution file." Condition="('$(Configuration)' == 'SingleImage') and ('$(Platform)' == 'x86')" />
   </Target>
   <Target Name="Mite_MsSql" Condition="'$(CurrentSolutionConfigurationContents)' != ''" Outputs="@(CollectedBuildOutput)" DependsOnTargets="Mite_Core">
     <MSBuild Projects="E:\working\Mite\Mite.MsSql\Mite.MsSql.csproj" ToolsVersion="$(ProjectToolsVersion)" Properties="Configuration=Release; Platform=AnyCPU; BuildingSolutionFile=true; CurrentSolutionConfigurationContents=$(CurrentSolutionConfigurationContents); SolutionDir=$(SolutionDir); SolutionExt=$(SolutionExt); SolutionFileName=$(SolutionFileName); SolutionName=$(SolutionName); SolutionPath=$(SolutionPath)" Condition=" ('$(Configuration)' == 'CD_ROM') and ('$(Platform)' == 'Any CPU') ">
