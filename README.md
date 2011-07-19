@@ -39,9 +39,9 @@ Supported Platforms
 * mite update
 
 ## Creating your first migration
-* execute "mite -c" 
+* "mite -c" 
 * open the file that was created and insert your up and down migration (See video for shortcut using tooling)
-* execute "mite update" in order to bring your database current
+* "mite update" in order to bring your database current
 
 ## Mite Best Practices
 * Use source control.  If you keep your migration scripts in the same repository as your source then you will always have the appropriate migrations in order to make your database current for that version.
