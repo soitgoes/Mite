@@ -22,8 +22,9 @@ Supported Platforms
 
 ## Getting Started with Mite on a Existing Database
 * Create a directory for your sql scripts.  For the purposes of this guide we'll use "scripts".
-* cd scripts
-* mite init
+    cd scripts
+    mite init
+
 * follow the steps on the wizard which will guide you through creating your _base.sql and creating your mite.config
 * That's it, see "Creating your first migration"
 
@@ -40,8 +41,10 @@ Supported Platforms
 
 ## Creating your first migration
     mite -c
+
 * open the file that was created and insert your up and down migration (See video for shortcut using tooling)
     mite update
+
 * in order to bring your database current
 
 ## Mite Best Practices
@@ -50,12 +53,16 @@ Supported Platforms
 
 ## Migrating Up & Down
     mite stepup
+
 * will execute one up migration
     mite stepdown
+
 * will execute one down migration
     mite -d 2011-01-03
+
 * will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
     mite /?
+
 * will bring up the help which list all commands.
 
 The MIT License
