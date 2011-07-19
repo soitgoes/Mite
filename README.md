@@ -63,6 +63,11 @@ and to make doing migrations easier than not doing migrations for even the most 
 * Download the distributable or Build from source
 * Add the location of Mite.exe to your PATH variable.
 
+## Mono
+* Download the mono distributable or Build from source with xbuild
+* Use the instructions above but prefix everything with mono 
+* `mono mite update`
+
 ## The MIT License
 
 Copyright (c) 2011 Whiteboard-IT LLC
