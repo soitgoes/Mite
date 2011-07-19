@@ -55,12 +55,15 @@ Supported Platforms
     mite stepup
 
 * will execute one up migration
+
     mite stepdown
 
 * will execute one down migration
+
     mite -d 2011-01-03
 
 * will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
+
     mite /?
 
 * will bring up the help which list all commands.
