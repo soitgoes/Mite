@@ -4,13 +4,14 @@ The goal of Mite is to make migrations simple and painless without introducing n
 and to make doing migrations easier than not doing migrations for even the most simple project.
 
 Supported Databases
-MsSql
-MySql
+* MsSql
+* MySql
 
 Supported Platforms
-Any machine that can run .net or mono applications
+* Any machine that can run .net or mono applications
 
-The tenants of Mite are as follows
+# Tenants of Mite
+
 * SQL is a perfectly good DSL that developers know and already have tooling for.
 * Down migrations are required for expected behavior on conflict resolution.
 * Order is significant in migrations and is enforced
@@ -22,7 +23,7 @@ The tenants of Mite are as follows
 * cd scripts
 * mite init
 * follow the steps on the wizard which will guide you through creating your _base.sql and creating your mite.config
-# That's it, see "Creating your first migration"
+* That's it, see "Creating your first migration"
 
 ## Getting Started with Mite on a New Project
 * cd scripts
@@ -30,6 +31,7 @@ The tenants of Mite are as follows
 
 ## Inheriting A Mite Project
 *If you are working on an existing project that uses mite and you do not have a database setup yet*
+
 * make sure that you have an empty database created and that are in your scripts directory
 * mite init
 * mite update
