@@ -4,6 +4,9 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Smo;
 using Mite.Core;
 namespace Mite.MsSql
 {
@@ -12,6 +15,8 @@ namespace Mite.MsSql
         private readonly string filePath;
         private readonly string tableName;
         private readonly SqlConnection connection;
+        private Server server;
+
         public MsSqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
         {            
         }
@@ -180,8 +185,53 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
 
         public string GenerateSqlScript(bool includeData)
         {
-            //use mysqldump to generate sql?
-            return "";
+            var serverConn = new ServerConnection(connection);
+            server = new Server(serverConn);
+            var db = new Database(server, connection.Database);
+            List<Urn> list = new List<Urn>();
+            DataTable dataTable = db.EnumObjects(DatabaseObjectTypes.Table);
+            foreach (DataRow row in dataTable.Rows)
+            {
+                list.Add(new Urn((string)row["Urn"]));
+            }
+
+            Scripter scripter = new Scripter();
+            scripter.Server = server;
+            scripter.Options.IncludeDatabaseContext = false;
+            scripter.Options.IncludeHeaders = true;
+            scripter.Options.SchemaQualify = true;
+            scripter.Options.ScriptData = includeData;            
+            scripter.Options.SchemaQualifyForeignKeysReferences = true;
+            scripter.Options.NoCollation = true;
+            scripter.Options.DriAllConstraints = true;
+            scripter.Options.DriAll = true;
+            scripter.Options.DriAllKeys = true;
+            scripter.Options.DriIndexes = true;
+            scripter.Options.ClusteredIndexes = true;
+            scripter.Options.NonClusteredIndexes = true;
+            scripter.Options.ToFileOnly = false;
+            var scripts = scripter.EnumScript(list.ToArray());
+            string result = "";
+            foreach (var script in scripts)
+                result += script + "\n";
+            return result;
+        }
+
+        public void ExecuteScript(string script)
+        {
+            connection.Open();
+            using (var trans = connection.BeginTransaction())
+            {
+                foreach (var sql in script.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var cmd = connection.CreateCommand();
+                    cmd.Transaction = trans;
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+                }
+                trans.Commit();
+            }
+            connection.Close();
         }
 
 

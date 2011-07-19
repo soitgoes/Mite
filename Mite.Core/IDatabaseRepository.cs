@@ -16,5 +16,10 @@ namespace Mite.Core
         void DropMigrationTable();
         bool MigrationTableExists();
         string GenerateSqlScript(bool includeData);
+        /// <summary>
+        /// Execute script does not create an entry in the _migrations table.  It's reserved for _base.sql
+        /// </summary>
+        /// <param name="sql"></param>
+        void ExecuteScript(string sql);
     }
 }

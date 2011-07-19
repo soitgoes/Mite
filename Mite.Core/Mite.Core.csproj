@@ -43,9 +43,7 @@
     <Compile Include="DateTimeExtensionMethods.cs" />
     <Compile Include="IMiteDatabase.cs" />
     <Compile Include="IDatabaseRepository.cs" />
-    <Compile Include="IScriptGenerator.cs" />
     <Compile Include="Migration.cs" />
-    <Compile Include="MigrationContainer.cs" />
     <Compile Include="MigrationHelper.cs" />
     <Compile Include="MigrationResult.cs" />
     <Compile Include="Migrator.cs" />

@@ -13,10 +13,12 @@ namespace Mite.Core
 
             foreach (var file in files)
             {
+                if (file.StartsWith("_"))
+                    continue;
                 var info = new FileInfo(file);
                 var sql = File.ReadAllText(file);
                 var match= sqlMatch.Match(sql);
-                var version = info.Name.Replace(".sql", "");
+                var version = info.Name.Replace(".sql", "");                
                 if ( match.Success)
                 {
                     yield return new Migration(version, match.Groups[1].Value, match.Groups[2].Value);    

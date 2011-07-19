@@ -13,8 +13,9 @@ namespace Mite
 {
     class Program
     {
-        private static string miteConfigPath = Environment.CurrentDirectory + "\\mite.config";
+        private static string miteConfigPath = Path.Combine(Environment.CurrentDirectory, "mite.config");
         private static IDatabaseRepository repo;
+        private static string baseFileName = "_base.sql";
 
         static void Main(string[] args)
         {
@@ -55,11 +56,24 @@ namespace Mite
             }
             if (args[0] == "init")
             {
+                var baseFilePath = Path.Combine(Environment.CurrentDirectory, baseFileName);
+                if (File.Exists(miteConfigPath) && File.Exists(baseFilePath))
+                {
+                    Console.WriteLine("Would you like me to execute the _base.sql for you? [y|n]");
+                    var execute = Console.ReadLine();
+                    if (execute == "y")
+                    {
+                        repo.ExecuteScript(File.ReadAllText(baseFilePath));
+                        Console.WriteLine("Schema created successfully");
+                    }
+                    return;
+                }
+
                 Console.WriteLine("What provider are you using?");
                 Console.WriteLine("[1] MySql.Data.MsSqlClient");
                 Console.WriteLine("[2] System.Data.SqlClient");
                 string providerName = "";
-                switch (Console.ReadKey().KeyChar )
+                switch (Console.ReadLine()[0])
                 {
                     case '1':
                         providerName = "MySql.Data.MsSqlClient";
@@ -80,7 +94,7 @@ namespace Mite
                 JObject obj = new JObject();
                 obj["providerName"] = providerName;
                 obj["connectionString"] = connectionString   ;
-                File.WriteAllText(Environment.CurrentDirectory + "\\mite.config", obj.ToString(Formatting.Indented));
+                File.WriteAllText(miteConfigPath, obj.ToString(Formatting.Indented));
                 repo = GetProvider(providerName, connectionString);
                 if (!repo.MigrationTableExists())
                 {
@@ -90,12 +104,33 @@ namespace Mite
                     Console.WriteLine("_migrations table already exists");
                     return;
                 }
-                //todo:generate base.sql.  make everything ignore base.sql except scratch
+                
+                if (!File.Exists(baseFilePath))
+                {
+                    Console.WriteLine("Would you like me to generate a _base.sql for you? [y|n]");
+                    var generateScript = Console.ReadLine();
+                    if (generateScript.ToLower() == "y")
+                    {
+                        bool includeData = false;
+                        Console.WriteLine("Would you like to include the data? [y|n]");
+                        var generateData = Console.ReadLine();
+                        if (generateData.ToLower() == "y")
+                        {
+                            includeData = true;
 
-                return;
+                        }
+                        var sql = repo.GenerateSqlScript(includeData);
+                        File.WriteAllText(baseFilePath, sql);
+                        Console.WriteLine(string.Format("{0} generated successfully", baseFileName));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Use mite -c to create your first migration.");
+                    }
+                    return;
+                }
             }
-            var configPath= Environment.CurrentDirectory + "\\mite.config";
-            var config= JObject.Parse(File.ReadAllText(configPath));
+            var config= JObject.Parse(File.ReadAllText(miteConfigPath));
             repo = GetProvider(config.Value<string>("providerName"), config.Value<string>("connectionString"));
             if (!repo.MigrationTableExists())
             {
@@ -200,7 +235,7 @@ namespace Mite
                     if (Console.ReadLine() == "y")
                     {
                         repo.DropMigrationTable();
-                        File.Delete(Path.Combine(Environment.CurrentDirectory, "mite.config"));
+                        File.Delete(miteConfigPath);
                         Console.WriteLine("mite cleaned successfully");
                     }
                     return;
@@ -257,11 +292,11 @@ namespace Mite
 
         private static string CreateMigration()
         {
-            var executingDirectory = Environment.CurrentDirectory; //todo: ensure this is correct when executed.
+            var executingDirectory = Environment.CurrentDirectory; 
             var now = DateTime.Now;
             var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
             var fileName = baseName + ".sql";
-            var fullPath = executingDirectory + "\\" + fileName;
+            var fullPath = Path.Combine(executingDirectory, fileName);
             File.WriteAllText(fileName, "/* up */\r\n\r\n/* down */\r\n\r\n");
             Console.WriteLine("Creating file '{0}'", fullPath);
             Process.Start(fullPath);

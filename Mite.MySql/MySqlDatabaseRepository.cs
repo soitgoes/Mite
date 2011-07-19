@@ -138,6 +138,22 @@ namespace Mite.MySql
             cmd.ExecuteNonQuery();
             this.connection.Close();
         }
+        public void ExecuteScript(string script)
+        {
+            connection.Open();
+            using (var trans = connection.BeginTransaction())
+            {
+                foreach (var sql in script.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var cmd = connection.CreateCommand();
+                    cmd.Transaction = trans;
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+                }
+                trans.Commit();
+            }
+            connection.Close();
+        }
 
         public bool MigrationTableExists()
         {
