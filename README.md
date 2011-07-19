@@ -1,6 +1,6 @@
-# Mite is a simple migration framework
+# Mite is a simple sql migration framework
 
-The goal of Mite is to make migrations simple and painless without introducing new DSL syntax, file formats or xml for the developer to learn 
+The goal of Mite is to make sql migrations simple and painless without introducing new DSL syntax, file formats or xml for the developer to learn 
 and to make doing migrations easier than not doing migrations for even the most simple project.
 
 ### Supported Databases
