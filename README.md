@@ -1,6 +1,6 @@
-# Mite is a simple migration framework
+# Mite is a simple sql migration framework
 
-The goal of Mite is to make migrations simple and painless without introducing new DSL syntax, file formats or xml for the developer to learn 
+The goal of Mite is to make sql migrations simple and painless without introducing new DSL syntax, file formats or xml for the developer to learn,  
 and to make doing migrations easier than not doing migrations for even the most simple project.
 
 ### Supported Databases
@@ -22,10 +22,10 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 ## Getting Started with Mite on a Existing Database
 * Create a directory for your sql scripts.  For the purposes of this guide we'll use "scripts".
-    cd scripts
-    mite init
+    `cd scripts`
+    `mite init`
 
-* follow the steps on the wizard which will guide you through creating your _base.sql and creating your mite.config
+* follow the steps in the wizard which will guide you through creating the _base.sql and mite.config
 * That's it, see "Creating your first migration"
 
 ## Getting Started with Mite on a New Project
@@ -35,29 +35,24 @@ and to make doing migrations easier than not doing migrations for even the most 
 ## Inheriting A Mite Project
 *If you are working on an existing project that uses mite and you do not have a database setup yet*
 
-* make sure that you have an empty database created and that are in your scripts directory
+* make sure that you have an empty database created and are in your scripts directory
 * `mite init`
 * `mite update`
 
 ## Creating your first migration
 * `mite -c`
 * open the file that was created and insert your up and down migration (See video for shortcut using tooling)
-* `mite update`
-* in order to bring your database current
+* `mite update`  (in order to bring your database current)
 
 ## Mite Best Practices
 * Use source control.  If you keep your migration scripts in the same repository as your source then you will always have the appropriate migrations in order to make your database current for that version.
 * Keep your scripts directory in a place that will not be published in a web accessible directory.  
 
 ## Migrating Up & Down
-* `mite stepup`
-* will execute one up migration
-* `mite stepdown`
-* will execute one down migration
-* `mite -d 2011-01-03`
-* will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
-* `mite /?`
-* will bring up the help which list all commands.
+* `mite stepup`  will execute one up migration
+* `mite stepdown`  will execute one down migration
+* `mite -d 2011-01-03`  will execute up or down migrations until it reaches that version exactly or it will execute migrations until it passes that key
+* `mite /?`  will bring up the help which list all commands.
 
 ## Installation
 * Download the distributable or Build from source
