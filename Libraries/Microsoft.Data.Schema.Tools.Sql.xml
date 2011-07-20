@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.Data.Schema.Tools.Sql</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlImage">
+      <summary>Represents SQL images during Data Generator design time. </summary>
+    </member>
+    <member name="M:Microsoft.Data.Schema.Sql.DataGenerator.SqlImage.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlImage" /> class.</summary>
+    </member>
+    <member name="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlUdt">
+      <summary>Represents SQL user types during data generator design time.</summary>
+    </member>
+    <member name="M:Microsoft.Data.Schema.Sql.DataGenerator.SqlUdt.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlUdt" /> class. </summary>
+    </member>
+    <member name="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlVariant">
+      <summary>Represents Transact-SQL variants during Data Generator design time.</summary>
+    </member>
+    <member name="M:Microsoft.Data.Schema.Sql.DataGenerator.SqlVariant.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlVariant" /> class.</summary>
+    </member>
+    <member name="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlXml">
+      <summary>Represents Transact-SQL XML types during Data Generator design time.</summary>
+    </member>
+    <member name="M:Microsoft.Data.Schema.Sql.DataGenerator.SqlXml.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.Data.Schema.Sql.DataGenerator.SqlXml" /> class.</summary>
+    </member>
+    <member name="T:Microsoft.Data.Schema.Tools.Sql.Compare.Schema.SqlModelInformation">
+      <summary>Provides equatable information about the current SQL Server database schema provider in the Schema Compare window of Visual Studio Application Lifecycle Management (ALM).</summary>
+    </member>
+    <member name="M:Microsoft.Data.Schema.Tools.Sql.Compare.Schema.SqlModelInformation.#ctor(Microsoft.Data.Schema.DatabaseSchemaProvider,Microsoft.Data.Schema.Sql.SchemaModel.SqlModelCapability)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.Data.Schema.Tools.Sql.Compare.Schema.SqlModelInformation" /> class by using the provided database schema provider and model capability indication. </summary>
+      <param name="databaseSchemaProvider">A <see cref="T:Microsoft.Data.Schema.DatabaseSchemaProvider" /> object.</param>
+      <param name="modelCapability">A <see cref="T:Microsoft.Data.Schema.Sql.SchemaModel.SqlModelCapability" /> object.</param>
+    </member>
+    <member name="M:Microsoft.Data.Schema.Tools.Sql.Compare.Schema.SqlModelInformation.Equals(Microsoft.Data.Schema.Tools.Compare.Schema.SchemaCompareModelInformation)">
+      <summary>Determines whether two <see cref="T:System.Object" /> instances are equal.</summary>
+      <returns>true if the objects are equal; otherwise, false.</returns>
+      <param name="other">An <see cref="T:System.Object" /> to compare to this object.</param>
+    </member>
+    <member name="P:Microsoft.Data.Schema.Tools.Sql.Compare.Schema.SqlModelInformation.ModelCapability">
+      <summary>Gets the <see cref="T:Microsoft.Data.Schema.Sql.SchemaModel.SqlModelCapability" /> for the associated database schema model. The set procedure is private.</summary>
+      <returns>The model capability for the associated database schema model.</returns>
+    </member>
+  </members>
+</doc>
