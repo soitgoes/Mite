@@ -19,6 +19,7 @@ namespace Mite
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Environment.CurrentDirectory:" + Environment.CurrentDirectory);
             if (args.Length == 0)
             {
                 Console.WriteLine("You must specify an option.  See /? for details");
