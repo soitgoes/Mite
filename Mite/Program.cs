@@ -57,53 +57,39 @@ namespace Mite
             if (args[0] == "init")
             {
                 
-
-                Console.WriteLine("What provider are you using?");
-                Console.WriteLine("[1] MySql.Data.MsSqlClient");
-                Console.WriteLine("[2] System.Data.SqlClient");
-                string providerName = "";
-                switch (Console.ReadLine()[0])
+                if (!File.Exists(miteConfigPath))
                 {
-                    case '1':
-                        providerName = "MySql.Data.MsSqlClient";
-                        break;
-                    case '2':
-                        providerName = "System.Data.SqlClient";
-                        break;
-                    default:
-                        Console.WriteLine("Option not recognized");
-                        return;
-                }
-                //determine the server
-                Console.WriteLine("Please enter you complete connection string.");
-                string connectionString = Console.ReadLine();
-
-                //determine the database
-
-                JObject obj = new JObject();
-                obj["providerName"] = providerName;
-                obj["connectionString"] = connectionString   ;
-                File.WriteAllText(miteConfigPath, obj.ToString(Formatting.Indented));
-                repo = GetProvider(providerName, connectionString);
-                var baseFilePath = Path.Combine(Environment.CurrentDirectory, baseFileName);
-                if (File.Exists(miteConfigPath) && File.Exists(baseFilePath)) {
-                    Console.WriteLine("Would you like me to execute the _base.sql for you? [y|n]");
-                    var execute = Console.ReadLine();
-                    if (execute == "y") {
-                        repo.ExecuteScript(File.ReadAllText(baseFilePath));
-                        Console.WriteLine("Schema created successfully");
+                    Console.WriteLine("What provider are you using?");
+                    Console.WriteLine("[1] MySql.Data.MySqlClient");
+                    Console.WriteLine("[2] System.Data.SqlClient");
+                    string providerName = "";
+                    switch (Console.ReadLine()[0])
+                    {
+                        case '1':
+                            providerName = "MySql.Data.MySqlClient";
+                            break;
+                        case '2':
+                            providerName = "System.Data.SqlClient";
+                            break;
+                        default:
+                            Console.WriteLine("Option not recognized");
+                            return;
                     }
-                    return;
-                }
-                if (!repo.MigrationTableExists())
-                {
-                    repo.Init(); //create the migration table
-                }else
-                {
-                    Console.WriteLine("_migrations table already exists");
-                    return;
-                }
+                    //determine the server
+                    Console.WriteLine("Please enter you complete .Net connection string.");
+                    string connectionString = Console.ReadLine();
+
+                    //determine the database
+
+                    JObject obj = new JObject();
+                    obj["providerName"] = providerName;
+                    obj["connectionString"] = connectionString;
+                    File.WriteAllText(miteConfigPath, obj.ToString(Formatting.Indented));
                 
+                }
+                var options = JObject.Parse(File.ReadAllText(miteConfigPath));
+                repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));    
+                var baseFilePath = Path.Combine(Environment.CurrentDirectory, baseFileName);                
                 if (!File.Exists(baseFilePath))
                 {
                     Console.WriteLine("Would you like me to generate a _base.sql for you? [y|n]");
@@ -116,7 +102,6 @@ namespace Mite
                         if (generateData.ToLower() == "y")
                         {
                             includeData = true;
-
                         }
                         var sql = repo.GenerateSqlScript(includeData);
                         File.WriteAllText(baseFilePath, sql);
@@ -128,7 +113,8 @@ namespace Mite
                     }
                     return;
                 }
-            }
+                Console.WriteLine("Nothing to do.  Use mite -c to create your first migration.");
+                }
             var config= JObject.Parse(File.ReadAllText(miteConfigPath));
             repo = GetProvider(config.Value<string>("providerName"), config.Value<string>("connectionString"));
             if (!repo.MigrationTableExists())

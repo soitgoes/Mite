@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Mite.Core;
 using MySql.Data.MySqlClient;
 
@@ -172,7 +174,29 @@ namespace Mite.MySql
 
         public string GenerateSqlScript(bool includeData)
         {
-            throw new NotImplementedException();
+            var proc = new Process();
+            var info = new ProcessStartInfo("mysqldump");
+            var pattern = new Regex("UID=(.*?);Password=(.*?)$", RegexOptions.IgnoreCase);
+            string user = "";
+            string password = "";
+            if (pattern.IsMatch(connection.ConnectionString))
+            {
+                var matches = pattern.Matches(connection.ConnectionString);
+                user = matches[0].Captures[1].Value;
+                password = matches[0].Captures[2].Value;
+            }else
+            {
+                throw new Exception("Could not match connection string pattern UID=(.*?);Password=(.*?)$");
+            }
+            var args = (!includeData ? "--no-data " : "") + "-u"+user+" -p"+password + connection.Database;
+            info.Arguments = args;
+            info.UseShellExecute = false;
+            info.RedirectStandardInput = true;
+            info.RedirectStandardOutput = true;
+            proc.StartInfo = info;
+            proc.Start();
+            var sql = proc.StandardOutput.ReadToEnd();
+            return sql;
         }
     }
 }
