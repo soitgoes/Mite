@@ -19,7 +19,7 @@ namespace Mite
 
         static void Main(string[] args)
         {
-            Console.WriteLine("miteConfigPath: " + miteConfigPath);
+            
             if (args.Length == 0)
             {
                 Console.WriteLine("You must specify an option.  See /? for details");
@@ -89,8 +89,8 @@ namespace Mite
                 
                 }
                 var options = JObject.Parse(File.ReadAllText(miteConfigPath));
-                repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));    
-                var baseFilePath = Path.Combine(Environment.CurrentDirectory, baseFileName);                
+                repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
+                var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName;
                 if (!File.Exists(baseFilePath))
                 {
                     Console.WriteLine("Would you like me to generate a _base.sql for you? [y|n]");
@@ -282,7 +282,7 @@ namespace Mite
             var now = DateTime.Now;
             var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
             var fileName = baseName + ".sql";
-            var fullPath = Path.Combine(executingDirectory, fileName);
+            var fullPath = executingDirectory + Path.DirectorySeparatorChar + fileName;
             File.WriteAllText(fileName, "/* up */\r\n\r\n/* down */\r\n\r\n");
             Console.WriteLine("Creating file '{0}'", fullPath);
             Process.Start(fullPath);
