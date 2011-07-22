@@ -13,13 +13,13 @@ namespace Mite
 {
     class Program
     {
-        private static string miteConfigPath = Path.Combine(Environment.CurrentDirectory, "mite.config");
+        private static string miteConfigPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "mite.config";
         private static IDatabaseRepository repo;
         private static string baseFileName = "_base.sql";
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Environment.CurrentDirectory:" + Environment.CurrentDirectory);
+            Console.WriteLine("miteConfigPath: " + miteConfigPath);
             if (args.Length == 0)
             {
                 Console.WriteLine("You must specify an option.  See /? for details");
