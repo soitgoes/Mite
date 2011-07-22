@@ -176,19 +176,20 @@ namespace Mite.MySql
         {
             var proc = new Process();
             var info = new ProcessStartInfo("mysqldump");
-            var pattern = new Regex("UID=(.*?);Password=(.*?)$", RegexOptions.IgnoreCase);
+            var pattern = new Regex("UID=(.*?);(Pwd|Password)=(.*?)(;|$)", RegexOptions.IgnoreCase);
             string user = "";
             string password = "";
             if (pattern.IsMatch(connection.ConnectionString))
             {
                 var matches = pattern.Matches(connection.ConnectionString);
-                user = matches[0].Captures[1].Value;
-                password = matches[0].Captures[2].Value;
+                user = matches[0].Groups[1].Value;
+                password = matches[0].Groups[3].Value;
             }else
             {
-                throw new Exception("Could not match connection string pattern UID=(.*?);Password=(.*?)$");
+                throw new Exception("Could not match connection string pattern UID=(.*?);(Pwd|Password)=(.*?)(;|$)");
             }
-            var args = (!includeData ? "--no-data " : "") + "-u"+user+" -p"+password + connection.Database;
+            
+            var args = (!includeData ? "--no-data " : "") + "-u"+user+" -p"+password + " " +  connection.Database;
             info.Arguments = args;
             info.UseShellExecute = false;
             info.RedirectStandardInput = true;

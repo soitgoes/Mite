@@ -21,6 +21,10 @@ namespace Mite.Core
             {
                 var version = this.database.Version;
                 var firstMigration = this.database.UnexcutedMigrations.FirstOrDefault();
+                if (firstMigration == null)
+                {
+                    return new MigrationResult(true, "No unexecuted migrations.", version, version);
+                }
                 databaseRepository.ExecuteUp(firstMigration);
                 return new MigrationResult(true, version, firstMigration.Version);
             }
@@ -39,6 +43,11 @@ namespace Mite.Core
             var resultingVersion =
                 migrationDictionary.Keys.Where(x => x.CompareTo(key) < 0).OrderByDescending(x => x).FirstOrDefault();
             var resultingMigration = migrationDictionary[resultingVersion];
+            if (migration == null)
+            {
+                return new MigrationResult(true, "No unexecuted migrations.", migration.Version, migration.Version);
+            }
+                
             databaseRepository.ExecuteDown(migration);
             return new MigrationResult(true, key, resultingMigration.Version);
         }
