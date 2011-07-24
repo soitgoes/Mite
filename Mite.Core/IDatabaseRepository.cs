@@ -16,10 +16,12 @@ namespace Mite.Core
         void DropMigrationTable();
         bool MigrationTableExists();
         string GenerateSqlScript(bool includeData);
+
         /// <summary>
-        /// Execute script does not create an entry in the _migrations table.  It's reserved for _base.sql
+        /// Record Migration should only be used if you are genning the Migration in the init
         /// </summary>
-        /// <param name="sql"></param>
-        void ExecuteScript(string sql);
+        /// <param name="migration"></param>
+        /// <returns></returns>
+        MiteDatabase RecordMigration(Migration migration);
     }
 }

@@ -73,8 +73,9 @@ namespace Mite.Core
             database = databaseRepository.Create();
             Update();
             database = databaseRepository.Create();
-            return new MigrationResult(true,priorVersion, database.Version );
+            return new MigrationResult(true,priorVersion, database.Version ); 
         }
+
         public MigrationResult DirtyResolution()
         {
             //run all non-executed transactions

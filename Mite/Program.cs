@@ -15,7 +15,6 @@ namespace Mite
     {
         private static string miteConfigPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "mite.config";
         private static IDatabaseRepository repo;
-        private static string baseFileName = "_base.sql";
 
         static void Main(string[] args)
         {
@@ -90,10 +89,11 @@ namespace Mite
                 }
                 var options = JObject.Parse(File.ReadAllText(miteConfigPath));
                 repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
-                var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName;
+                var baseFileName = GetMigrationFileName();
+                var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName+ ".sql";
                 if (!File.Exists(baseFilePath))
                 {
-                    Console.WriteLine("Would you like me to generate a _base.sql for you? [y|n]");
+                    Console.WriteLine("Would you like me to generate a migration script based on the current database? [y|n]");
                     var generateScript = Console.ReadLine();
                     if (generateScript.ToLower() == "y")
                     {
@@ -107,6 +107,7 @@ namespace Mite
                         var sql = repo.GenerateSqlScript(includeData);
                         File.WriteAllText(baseFilePath, sql);
                         Console.WriteLine(string.Format("{0} generated successfully", baseFileName));
+                        repo.RecordMigration(new Migration(baseFileName, sql, ""));
                     }
                     else
                     {
@@ -279,17 +280,21 @@ namespace Mite
         private static string CreateMigration()
         {
             var executingDirectory = Environment.CurrentDirectory; 
-            var now = DateTime.Now;
-            var baseName = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
+            string baseName = GetMigrationFileName();
             var fileName = baseName + ".sql";
             var fullPath = executingDirectory + Path.DirectorySeparatorChar + fileName;
-            File.WriteAllText(fileName, "/* up */\r\n\r\n/* down */\r\n\r\n");
+            var newlines = Environment.NewLine + Environment.NewLine;
+            File.WriteAllText(fileName, "/* up */"+newlines+"/* down */" + newlines);
             Console.WriteLine("Creating file '{0}'", fullPath);
             Process.Start(fullPath);
             return baseName;
         }
 
-
+        private static string GetMigrationFileName()
+        {
+            var now = DateTime.Now;
+            return now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
+        }
     }
 
 }
