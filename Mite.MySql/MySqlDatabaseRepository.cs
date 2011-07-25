@@ -38,6 +38,18 @@ namespace Mite.MySql
             return Create();
         }
 
+
+        protected override IDbConnection GetConnWithoutDatabaseSpecified()
+        {
+            var connString = connection.ConnectionString;
+            var dbPattern = new Regex(@"Database=(.*?)(;|$)", RegexOptions.IgnoreCase);
+            if (dbPattern.IsMatch(connString))
+            {
+                connString  = dbPattern.Replace(connString, "");
+            }
+            return new MySqlConnection(connString);
+        }
+        
         protected override IDbCommand GetMigrationCmd(Migration migration)
         {
             var migrationCmd = (MySqlCommand)connection.CreateCommand();
@@ -46,6 +58,7 @@ namespace Mite.MySql
             migrationCmd.Parameters.Add("?hash", migration.Hash);
             return migrationCmd;
         }
+
         public override bool MigrationTableExists()
         {
             this.connection.Open();

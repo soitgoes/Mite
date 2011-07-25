@@ -48,21 +48,26 @@ namespace Mite.Core
         }
         public virtual MiteDatabase Create()
         {
-            //read all the migrations from the database and filesystem and create a MiteDatabase
-            connection.Open();
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = string.Format("select * from {0}", tableName);
             var hashes = new Dictionary<string, string>();
-            using (var dr = cmd.ExecuteReader())
+            //read all the migrations from the database and filesystem and create a MiteDatabase
+            if (this.DatabaseExists() && this.MigrationTableExists())
             {
-                while (dr.Read())
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = string.Format("select * from {0}", tableName);
+                using (var dr = cmd.ExecuteReader())
                 {
-                    hashes.Add(dr["key"].ToString(), dr["hash"].ToString());    
+                    while (dr.Read())
+                    {
+                        hashes.Add(dr["key"].ToString(), dr["hash"].ToString());
+                    }
                 }
+                connection.Close();    
             }
-            connection.Close();
             return new MiteDatabase(MigrationHelper.ReadFromDirectory(filePath).ToList(), hashes);
         }
+
+        
 
         public virtual MiteDatabase RecordMigration(Migration migration)
         {
@@ -76,6 +81,29 @@ namespace Mite.Core
             connection.Close();
             return Create();
         }
+        public virtual void CreateDatabase()
+        {
+            using(var conn = GetConnWithoutDatabaseSpecified())
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "create database " + connection.Database;
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+        }
+        public virtual void DropDatabase()
+        {
+            using (var conn = GetConnWithoutDatabaseSpecified())
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "drop database " + connection.Database;
+                cmd.ExecuteNonQuery();
+                conn.Close();   
+            }
+        }
+
         public virtual  MiteDatabase ExecuteUp(Migration migration)
         {
             connection.Open();
@@ -139,6 +167,33 @@ namespace Mite.Core
             }
             connection.Close();
             return Create();
+        }
+
+        protected abstract IDbConnection GetConnWithoutDatabaseSpecified();
+
+        public virtual bool DatabaseExists()
+        {
+            bool result = false;
+            using (var conn = GetConnWithoutDatabaseSpecified())
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "use " + connection.Database;
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    result = true; 
+                }
+                catch (Exception ex)
+                {
+                    result = false;
+                }finally
+                {
+                    conn.Close();
+                }
+                
+            }
+            return result;
         }
     }
 }

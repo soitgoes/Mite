@@ -87,6 +87,13 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return result;
         }
 
+        protected override IDbConnection GetConnWithoutDatabaseSpecified()
+        {
+            var csb = new SqlConnectionStringBuilder(connection.ConnectionString);
+            csb["Database"] = "master";
+            return new SqlConnection(csb.ConnectionString);
+        }
+
         public override string GenerateSqlScript(bool includeData)
         {
             var serverConn = new ServerConnection((SqlConnection)connection);
@@ -121,8 +128,6 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             serverConn.Disconnect();
             return result;
         }
-
-       
 
         public void ExecuteScript(string script)
         {

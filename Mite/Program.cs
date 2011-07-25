@@ -41,7 +41,7 @@ namespace Mite
                     "-d\tSpecifies the destination version to migrate to.  (can be greater than migrations available)");
                 Console.WriteLine("update\tRuns all migrations greater than the current version");
                 Console.WriteLine("-c\tCreates and launches the new migration files");
-                Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
+              //  Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
                 Console.WriteLine("stepup\texecutes one migration file greater than the current version");
                 Console.WriteLine("stepdown\texecutes one migration file less than the current version");
                 Console.WriteLine(
@@ -119,30 +119,25 @@ namespace Mite
                 }
             var config= JObject.Parse(File.ReadAllText(miteConfigPath));
             repo = GetProvider(config.Value<string>("providerName"), config.Value<string>("connectionString"));
-            if (!repo.MigrationTableExists())
-            {
-                repo.Init();
-            }
+            
+            
             var database = repo.Create();
-            var migrations = database.UnexcutedMigrations;
-
             var migrator = new Migrator(database, repo);
 
             if (!EnforceConfig()) return;
             MigrationResult resultingVersion = null;
-            var unexecuted = database.UnexcutedMigrations;
             switch (args[0])
             {
                 case "update":
                     if (database.IsValidState())
                     {
-                        if (unexecuted.Count() == 0)
+                        if (database.UnexcutedMigrations.Count() == 0)
                         {
                             Console.WriteLine("No migrations to execute");
                             Console.WriteLine("Current Version: " + database.Version);
                             return;
                         }
-                        foreach (var migToExe in unexecuted)
+                        foreach (var migToExe in database.UnexcutedMigrations)
                         {
                             Console.WriteLine("Executing migration " + migToExe.Version);
                             repo.ExecuteUp(migToExe);
@@ -171,7 +166,7 @@ namespace Mite
                     Console.WriteLine("Current Version:" + database.Version);
                     if (database.IsValidState())
                     {
-                        if (migrations.Count() == 0)
+                        if (database.UnexcutedMigrations.Count() == 0)
                         {
                             Console.WriteLine("No migrations to execute");
                             return;
@@ -198,7 +193,7 @@ namespace Mite
                     }
 
                     Console.WriteLine("Unexecuted Migrations:");
-                    foreach (var mig in migrations)
+                    foreach (var mig in database.UnexcutedMigrations)
                     {
                         Console.WriteLine(mig.Version);
                     }

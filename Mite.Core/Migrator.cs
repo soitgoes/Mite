@@ -54,12 +54,13 @@ namespace Mite.Core
 
         public void FromScratch()
         {
-            //delete execute all downs that are in the database  then execute the ups.
-            foreach (var mig in database.ExecutedMigrations)
+            //drop the database and execute all the ups 
+            if (databaseRepository.DatabaseExists())
             {
-                databaseRepository.ExecuteDown(mig);
+                databaseRepository.DropDatabase();
             }
-            database = databaseRepository.Create();
+            databaseRepository.CreateDatabase();
+            database =databaseRepository.Init();
             foreach (var mig in database.UnexcutedMigrations)
             {
                 databaseRepository.ExecuteUp(mig);
