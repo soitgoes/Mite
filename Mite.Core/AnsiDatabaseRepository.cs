@@ -50,7 +50,8 @@ namespace Mite.Core
         {
             var hashes = new Dictionary<string, string>();
             //read all the migrations from the database and filesystem and create a MiteDatabase
-            if (this.DatabaseExists() && this.MigrationTableExists())
+            //this.DatabaseExists() &&  
+            if (this.MigrationTableExists())
             {
                 connection.Open();
                 var cmd = connection.CreateCommand();
@@ -126,21 +127,8 @@ namespace Mite.Core
             return Create();
         }
 
-        protected virtual IDbCommand GetMigrationCmd(Migration migration)
-        {
-            var migrationCmd = connection.CreateCommand();
-                
-            migrationCmd.CommandText = string.Format("insert into {0} VALUES(@key, @hash)", tableName);
-            IDbDataParameter key = migrationCmd.CreateParameter();
-            key.Value = migration.Version;
-            key.ParameterName = "key";
-            IDbDataParameter hash = migrationCmd.CreateParameter();
-            hash.Value = migration.Hash;
-            hash.ParameterName = "hash";
-            migrationCmd.Parameters.Add(key);
-            migrationCmd.Parameters.Add(hash);
-            return migrationCmd;
-        }
+        protected abstract IDbCommand GetMigrationCmd(Migration migration);
+      
 
         public virtual MiteDatabase ExecuteDown(Migration migration)
         {

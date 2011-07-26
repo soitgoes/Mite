@@ -129,6 +129,15 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return result;
         }
 
+        protected override IDbCommand GetMigrationCmd(Migration migration)
+        {
+
+            var migrationCmd = (SqlCommand)connection.CreateCommand();
+            migrationCmd.CommandText = string.Format("insert into {0} VALUES(@key, @hash)", tableName);
+            migrationCmd.Parameters.AddWithValue("@key", migration.Version);
+            migrationCmd.Parameters.AddWithValue("@hash", migration.Hash);
+            return migrationCmd;
+        }
         public void ExecuteScript(string script)
         {
             connection.Open();

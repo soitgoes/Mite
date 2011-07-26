@@ -41,6 +41,7 @@ namespace Mite.MySql
 
         protected override IDbConnection GetConnWithoutDatabaseSpecified()
         {
+            //return connection;
             var connString = connection.ConnectionString;
             var dbPattern = new Regex(@"Database=(.*?)(;|$)", RegexOptions.IgnoreCase);
             if (dbPattern.IsMatch(connString))
@@ -49,7 +50,7 @@ namespace Mite.MySql
             }
             return new MySqlConnection(connString);
         }
-        
+       
         protected override IDbCommand GetMigrationCmd(Migration migration)
         {
             var migrationCmd = (MySqlCommand)connection.CreateCommand();
@@ -78,19 +79,20 @@ namespace Mite.MySql
         {
             var proc = new Process();
             var info = new ProcessStartInfo("mysqldump");
-            var pattern = new Regex("UID=(.*?);(Pwd|Password)=(.*?)(;|$)", RegexOptions.IgnoreCase);
+            var pattern = new Regex("(UID|User Id)=(.*?);(Password|Pwd)=(.*?)(;|$)", RegexOptions.IgnoreCase);
             string user = "";
             string password = "";
-            if (pattern.IsMatch(connection.ConnectionString))
+            //if (pattern.IsMatch(connection.ConnectionString))
             {
                 var matches = pattern.Matches(connection.ConnectionString);
-                user = matches[0].Groups[1].Value;
-                password = matches[0].Groups[3].Value;
-            }else
+                user = matches[0].Groups[2].Value;
+                password = matches[0].Groups[4].Value;
+            }
+            /*else
             {
                 throw new Exception("Could not match connection string pattern UID=(.*?);(Pwd|Password)=(.*?)(;|$)");
             }
-            
+            */
             var args = (!includeData ? "--no-data " : "") + "-u"+user+" -p"+password + " " +  connection.Database;
             info.Arguments = args;
             info.UseShellExecute = false;
