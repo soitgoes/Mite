@@ -92,6 +92,8 @@ namespace Mite.Core
         {
             if (!database.IsValidState())
                 throw new Exception("Database must be in a valid state in order to update it.");
+            if (!databaseRepository.DatabaseExists())
+                databaseRepository.Init();
             var version = database.Version;
             foreach (var mig in database.UnexcutedMigrations)
             {
@@ -109,6 +111,8 @@ namespace Mite.Core
             if (isUp && !database.IsValidState())
                 throw new Exception(
                     "Database must be in a valid state in order to use migrate in the up direction.  Try mite update instead.");
+            if (!databaseRepository.MigrationTableExists())
+                databaseRepository.Init();
             if (isUp)
             {
                 var migrationsToExecute =
