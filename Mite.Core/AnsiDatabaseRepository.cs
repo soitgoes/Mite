@@ -134,6 +134,8 @@ namespace Mite.Core
 
         public virtual MiteDatabase ExecuteDown(Migration migration)
         {
+            if (MigrationTableExists())
+                Init();
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
