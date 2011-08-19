@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mite.Core
 {
@@ -112,7 +113,8 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
-                foreach (var sql in migration.UpSql.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                var split = new Regex("^GO$", RegexOptions.Singleline);
+                foreach (var sql in split.Split(migration.UpSql))
                 {
                     var cmd = connection.CreateCommand();
                     cmd.Transaction = trans;
@@ -137,7 +139,8 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                foreach (var sql in migration.DownSql.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                var split = new Regex("^GO$", RegexOptions.Singleline);
+                foreach (var sql in split.Split(migration.DownSql))
                 {
                     var cmd = connection.CreateCommand();
                     cmd.Transaction = trans;
