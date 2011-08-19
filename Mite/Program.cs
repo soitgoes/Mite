@@ -88,6 +88,9 @@ namespace Mite
                 
                 }
                 var options = JObject.Parse(File.ReadAllText(miteConfigPath));
+
+                if (!configIsValid(options)) return;
+
                 repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
                 var baseFileName = GetMigrationFileName();
                 var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName+ ".sql";
@@ -116,10 +119,10 @@ namespace Mite
                     return;
                 }
                 Console.WriteLine("Nothing to do.  Use mite -c to create your first migration.");
-                }
-            var config= JObject.Parse(File.ReadAllText(miteConfigPath));
+            }
+            var config = JObject.Parse(File.ReadAllText(miteConfigPath));
+            if (!configIsValid(config)) return;
             repo = GetProvider(config.Value<string>("providerName"), config.Value<string>("connectionString"));
-            
             
             var database = repo.Create();
             var migrator = new Migrator(database, repo);
@@ -226,6 +229,22 @@ namespace Mite
             {
                 Console.WriteLine(resultingVersion.Message);
             }
+        }
+
+        private static bool configIsValid(JObject options)
+        {
+            bool isValid = true;
+            if(string.IsNullOrEmpty(options.Value<string>("providerName")))
+            {
+                Console.Write("Invalid Config - providerName is requied.");
+                isValid = false;
+            }
+            if(string.IsNullOrEmpty(options.Value<string>("connectionString")))
+            {
+                Console.Write("Invalid Config - connectionString is requied.");
+                isValid = false;
+            }
+            return isValid;
         }
 
         private static IDatabaseRepository GetProvider(string providerName, string connectionString)
