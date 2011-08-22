@@ -147,8 +147,8 @@ namespace Mite
                     return;
                 }
 
+                var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName;
 
-                var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName+ ".sql";
                 if (!File.Exists(baseFilePath))
                 {
                     Console.WriteLine("Would you like me to generate a migration script based on the current database? [y|N]");
