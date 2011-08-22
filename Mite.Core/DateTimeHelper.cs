@@ -4,9 +4,9 @@ namespace Mite.Core
 {
     public static class DateTimeHelper
     {
-        public static string ToIso(DateTime input)
+        public static string ToIso(this DateTime input)
         {
-            return input.ToString("yyyy-MM-dd") + "T" + input.ToString("mm-dd-hh") + "Z";
+            return input.ToUniversalTime().ToString("yyyy-MM-dd") + "T" + input.ToUniversalTime().ToString("hh-mm-ss") + "Z";
         }
     }
 }

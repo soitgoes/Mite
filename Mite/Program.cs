@@ -368,12 +368,12 @@ namespace Mite
             DirectoryInfo taskDirectory = new DirectoryInfo(Environment.CurrentDirectory);
             
             FileInfo[] proposedFile = new FileInfo[] { new FileInfo(scriptFilename) };
-            FileInfo[] proposedDirectoryContents = taskDirectory.GetFiles("*.sql").Concat(proposedFile).ToArray();
+            FileInfo[] proposedDirectoryContents = taskDirectory.GetFiles().Concat(proposedFile).Where(x => x.Name != "mite.config").ToArray();
 
             Array.Sort(proposedDirectoryContents, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
             if(proposedDirectoryContents[proposedDirectoryContents.Count()-1].Name != scriptFilename)
             {
-                Console.WriteLine("The requested filenameis invalid - files must sort with new file at end of list.\n");
+                Console.WriteLine("The requested filename is invalid.  Filename must be ASCII greater than all other sql files in directory.\n");
                 isValid = false;
             }
             return isValid;
@@ -386,7 +386,7 @@ namespace Mite
             {
                 var now = DateTime.Now;
                 //return now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
-                migrationScriptFilename = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
+                migrationScriptFilename = now.ToIso();
             }
             else
             {
