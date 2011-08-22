@@ -18,7 +18,7 @@ namespace Mite.Core
                     continue;
                 var sql = File.ReadAllText(file);
                 var match= sqlMatch.Match(sql);
-                var version = info.Name.Replace(info.Extension, "");
+                var version = !string.IsNullOrEmpty(info.Extension) ? info.Name.Replace(info.Extension, "") : info.Name;
                 if ( match.Success)
                 {
                     yield return new Migration(version, match.Groups[1].Value, match.Groups[2].Value);    
