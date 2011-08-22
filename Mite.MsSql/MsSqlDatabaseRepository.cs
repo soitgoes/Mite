@@ -19,7 +19,11 @@ namespace Mite.MsSql
         {
             this.filePath = filePath;
             this.tableName = tableName;
-            connection = new SqlConnection(connectionString);
+            var connString = new SqlConnectionStringBuilder(connectionString);
+            connString.PersistSecurityInfo = true;
+            connection = new SqlConnection(){ ConnectionString = connString.ToString()};
+            
+            
         }
 
         public override MiteDatabase Init()
