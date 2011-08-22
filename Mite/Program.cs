@@ -35,17 +35,21 @@ namespace Mite
 #endif
             if (args[0] == "/?")
             {
+                Console.WriteLine("Mite - Simple and painless SQL migrations.\n\n");
+                Console.WriteLine("mite.exe [-v][init [filename]][-c [filename]][-d [destination]][update/stepup/stepdown]\n\n");
                 Console.WriteLine("Options are as follows:");
-                Console.WriteLine("-v\tReturns the current version of Mite");
+                Console.WriteLine("-v\t\tReturns the current version of Mite");
                 Console.WriteLine(
-                    "-d\tSpecifies the destination version to migrate to.  (can be greater than migrations available)");
-                Console.WriteLine("update\tRuns all migrations greater than the current version");
-                Console.WriteLine("-c\tCreates and launches the new migration files");
+                    "-d\t\tSpecifies the destination version to migrate to.\n\t\t(can be greater than migrations available)");
+                Console.WriteLine("update\t\tRuns all migrations greater than the current version");
+                Console.WriteLine("-c\t\tCreates and launches the new migration files");
+                
               //  Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
-                Console.WriteLine("stepup\texecutes one migration file greater than the current version");
-                Console.WriteLine("stepdown\texecutes one migration file less than the current version");
+                Console.WriteLine("stepup\t\tExecutes one migration file greater than the current version");
+                Console.WriteLine("stepdown\tExecutes one migration file less than the current version");
                 Console.WriteLine(
-                    "init Creates and opens the initial up file and makes.  Creates the _migrations table and makes and entry into the _migrations table for the initial up.");
+                    "init\t\tCreates and opens the initial up file and makes.\n\t\tCreates the _migrations table and makes and entry into the \n\t\t_migrations table for the initial up.");
+                Console.WriteLine("filename\t(OPTIONAL) Desired filename of migration script");
                 return;
             }
           if (args[0] == "-c")
