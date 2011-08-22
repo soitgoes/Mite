@@ -99,7 +99,7 @@ namespace Mite
                             return;
                     }
                     //determine the server
-                    Console.WriteLine("Please enter you complete .Net connection string.");
+                    Console.WriteLine("Please enter your complete .Net connection string.");
                     string connectionString = Console.ReadLine();
 
                     //determine the database
@@ -115,6 +115,18 @@ namespace Mite
                 if (!configIsValid(options)) return;
 
                 repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
+
+                
+                if(new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(x => x.Name != "mite.config").ToArray().Count() > 0)
+                {
+                    Console.WriteLine("Working directory is not clean.\nPlease ensure no existing scripts or project files exist when performing init.");
+                    return;
+                }
+                if(repo.MigrationTableExists())
+                {
+                    Console.WriteLine("A _migration table already exists.\n'init' should only be used for new setups.\nSee 'mite /?' for help.");
+                    return;
+                }
 
                 var baseFileName = "";
                 try
@@ -395,8 +407,6 @@ namespace Mite
                 throw new FormatException(string.Format("Error: Invalid Filename: {0}", migrationScriptFilename));
             }
             return migrationScriptFilename;
-            
-
         }
     }
 
