@@ -43,13 +43,12 @@ namespace Mite
                     "-d\t\tSpecifies the destination version to migrate to.\n\t\t(can be greater than migrations available)");
                 Console.WriteLine("update\t\tRuns all migrations greater than the current version");
                 Console.WriteLine("-c\t\tCreates and launches the new migration files");
-                
-              //  Console.WriteLine("scratch\tdrops the database and recreates it using all the up scripts");
+                Console.WriteLine("\t\tfilename(optional): desired filename of migration script");
                 Console.WriteLine("stepup\t\tExecutes one migration file greater than the current version");
                 Console.WriteLine("stepdown\tExecutes one migration file less than the current version");
                 Console.WriteLine(
                     "init\t\tCreates and opens the initial up file and makes.\n\t\tCreates the _migrations table and makes and entry into the \n\t\t_migrations table for the initial up.");
-                Console.WriteLine("filename\t(OPTIONAL) Desired filename of migration script");
+                Console.WriteLine("\t\tfilename(optional): desired filename of migration script");
                 return;
             }
           if (args[0] == "-c")
@@ -385,12 +384,10 @@ namespace Mite
             if(string.IsNullOrEmpty(scriptFilename))
             {
                 var now = DateTime.Now;
-                //return now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
                 migrationScriptFilename = now.ToIso();
             }
             else
             {
-                //return scriptFilename;
                 migrationScriptFilename = scriptFilename;
             }
             if(!FilenameIsValid(migrationScriptFilename))
