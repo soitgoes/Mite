@@ -51,7 +51,31 @@ namespace Mite
           if (args[0] == "-c")
             {
                 if (!EnforceConfig()) return;
-                CreateMigration();
+                try
+                {
+                    if (args.Count() > 1 && !string.IsNullOrEmpty(args[1]))
+                    {
+                        CreateMigration(args[1]);
+                    }
+                    else
+                    {
+                        CreateMigration();
+                        
+                    }
+                }
+                catch (FormatException ex)
+                {
+                    Console.Write(ex.Message);
+                    Console.Write("\n\nWould you like to output the current filenames in order to diagnose the conflict?\n[Y|N]");
+                    if (Console.ReadLine().ToLower() == "y")
+                        OutputExistingMigrationScriptFilenames();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                
+                
                 return;
             }
             if (args[0] == "init")
@@ -92,7 +116,30 @@ namespace Mite
                 if (!configIsValid(options)) return;
 
                 repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
-                var baseFileName = GetMigrationFileName();
+
+                var baseFileName = "";
+                try
+                {
+                    if (args.Count() > 1 && !string.IsNullOrEmpty(args[1]))
+                    {
+                        baseFileName = GetMigrationFileName(args[1]);
+                    }
+                    else
+                    {
+                        baseFileName = GetMigrationFileName();
+                    }
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.Write(ex.Message);
+                    Console.Write("\n\nWould you like to output the current filenames in order to diagnose the conflict? \n [Y|N]");
+                    if (Console.ReadLine().ToLower() == "y")
+                        OutputExistingMigrationScriptFilenames();
+                    return;
+                }
+
+
                 var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName+ ".sql";
                 if (!File.Exists(baseFilePath))
                 {
@@ -161,7 +208,18 @@ namespace Mite
                     }
                     break;
                 case "-d":
-                    var version = args[1].Replace(".sql", "");
+                    var version = "";
+                    if(args.Count() < 2)
+                    {
+                        Console.Write("You did not specify a destination version - Please specify a destination: ");
+                        version = Console.ReadLine();
+                        if(string.IsNullOrEmpty(version))
+                        {
+                            Console.WriteLine("ERROR: You have failed to specify a destination version.  Please determine your destination version and try again.");
+                            return;
+                        }
+                    }
+                    version = args[1].Replace(".sql", "");
                     resultingVersion = migrator.MigrateTo(version);
                     Console.WriteLine("Current Version:" + resultingVersion.AfterMigration);
                     break;
@@ -290,24 +348,77 @@ namespace Mite
             return File.ReadAllText(miteConfigPath);
         }
 
-
-        private static string CreateMigration()
+        private static string CreateMigration(string scriptFileName = "")
         {
-            var executingDirectory = Environment.CurrentDirectory; 
-            string baseName = GetMigrationFileName();
+            var executingDirectory = Environment.CurrentDirectory;
+            string baseName = scriptFileName;
+            
+            try
+            {
+                baseName = GetMigrationFileName(scriptFileName);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
             var fileName = baseName + ".sql";
             var fullPath = executingDirectory + Path.DirectorySeparatorChar + fileName;
             var newlines = Environment.NewLine + Environment.NewLine;
-            File.WriteAllText(fileName, "/* up */"+newlines+"/* down */" + newlines);
+            File.WriteAllText(fileName, "/* up */" + newlines + "/* down */" + newlines);
             Console.WriteLine("Creating file '{0}'", fullPath);
             Process.Start(fullPath);
             return baseName;
         }
 
-        private static string GetMigrationFileName()
+        private static bool FilenameIsValid(string scriptFilename)
         {
-            var now = DateTime.Now;
-            return now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
+            bool isValid = true;
+            DirectoryInfo taskDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+            
+            FileInfo[] proposedFile = new FileInfo[] { new FileInfo(scriptFilename) };
+            FileInfo[] proposedDirectoryContents = taskDirectory.GetFiles("*.sql").Concat(proposedFile).ToArray();
+
+            Array.Sort(proposedDirectoryContents, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
+            if(proposedDirectoryContents[proposedDirectoryContents.Count()-1].Name != scriptFilename)
+            {
+                Console.WriteLine("The requested filenameis invalid - files must sort with new file at end of list.\n");
+                isValid = false;
+            }
+            return isValid;
+        }
+
+
+        private static void OutputExistingMigrationScriptFilenames()
+        {
+            DirectoryInfo taskDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+            FileInfo[] scriptDirectoryContents = taskDirectory.GetFiles("*.sql").ToArray();
+            Array.Sort(scriptDirectoryContents, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
+
+            Console.WriteLine(String.Join("\n", scriptDirectoryContents.Select(x => x.Name)));
+        }
+
+
+        private static string GetMigrationFileName(string scriptFilename = "")
+        {
+            var migrationScriptFilename = "";
+            if(string.IsNullOrEmpty(scriptFilename))
+            {
+                var now = DateTime.Now;
+                //return now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
+                migrationScriptFilename = now.ToString("yyyy-MM-dd") + "T" + now.ToString("HH-mm-ss") + "Z";
+            }
+            else
+            {
+                //return scriptFilename;
+                migrationScriptFilename = scriptFilename;
+            }
+            if(!FilenameIsValid(migrationScriptFilename))
+            {
+                throw new FormatException(string.Format("Error: Invalid Filename: {0}", migrationScriptFilename));
+            }
+            return migrationScriptFilename;
+            
+
         }
     }
 
