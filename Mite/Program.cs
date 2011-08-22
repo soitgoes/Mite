@@ -64,15 +64,11 @@ namespace Mite
                     else
                     {
                         CreateMigration();
-                        
                     }
                 }
                 catch (FormatException ex)
                 {
                     Console.Write(ex.Message);
-                    Console.Write("\n\nWould you like to output the current filenames in order to diagnose the conflict?\n[Y|N]");
-                    if (Console.ReadLine().ToLower() == "y")
-                        OutputExistingMigrationScriptFilenames();
                 }
                 catch(Exception ex)
                 {
@@ -137,9 +133,6 @@ namespace Mite
                 {
                     Console.WriteLine(ex.Message);
                     Console.Write(ex.Message);
-                    Console.Write("\n\nWould you like to output the current filenames in order to diagnose the conflict? \n [Y|N]");
-                    if (Console.ReadLine().ToLower() == "y")
-                        OutputExistingMigrationScriptFilenames();
                     return;
                 }
 
@@ -147,12 +140,12 @@ namespace Mite
                 var baseFilePath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + baseFileName+ ".sql";
                 if (!File.Exists(baseFilePath))
                 {
-                    Console.WriteLine("Would you like me to generate a migration script based on the current database? [y|n]");
+                    Console.WriteLine("Would you like me to generate a migration script based on the current database? [y|N]");
                     var generateScript = Console.ReadLine();
                     if (generateScript.ToLower() == "y")
                     {
                         bool includeData = false;
-                        Console.WriteLine("Would you like to include the data? [y|n]");
+                        Console.WriteLine("Would you like to include the data? [y|N]");
                         var generateData = Console.ReadLine();
                         if (generateData.ToLower() == "y")
                         {
@@ -215,13 +208,8 @@ namespace Mite
                     var version = "";
                     if(args.Count() < 2)
                     {
-                        Console.Write("You did not specify a destination version - Please specify a destination: ");
-                        version = Console.ReadLine();
-                        if(string.IsNullOrEmpty(version))
-                        {
-                            Console.WriteLine("ERROR: You have failed to specify a destination version.  Please determine your destination version and try again.");
-                            return;
-                        }
+                        Console.WriteLine("ERROR: You have failed to specify a destination version.\nPlease determine your destination version and try again.");
+                        return;
                     }
                     version = args[1].Replace(".sql", "");
                     resultingVersion = migrator.MigrateTo(version);
@@ -390,17 +378,6 @@ namespace Mite
             }
             return isValid;
         }
-
-
-        private static void OutputExistingMigrationScriptFilenames()
-        {
-            DirectoryInfo taskDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-            FileInfo[] scriptDirectoryContents = taskDirectory.GetFiles("*.sql").ToArray();
-            Array.Sort(scriptDirectoryContents, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
-
-            Console.WriteLine(String.Join("\n", scriptDirectoryContents.Select(x => x.Name)));
-        }
-
 
         private static string GetMigrationFileName(string scriptFilename = "")
         {
