@@ -113,7 +113,7 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
-                var split = new Regex("^GO$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                var split = new Regex(@"\sGO\s", RegexOptions.Multiline);
                 foreach (var sql in split.Split(migration.UpSql))
                 {
                     var cmd = connection.CreateCommand();
@@ -136,10 +136,12 @@ namespace Mite.Core
 
         public virtual MiteDatabase ExecuteDown(Migration migration)
         {
+            if (!MigrationTableExists())
+                Init();
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                var split = new Regex("^GO$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                var split = new Regex(@"\sGO\s", RegexOptions.Multiline);
                 foreach (var sql in split.Split(migration.DownSql))
                 {
                     var cmd = connection.CreateCommand();
