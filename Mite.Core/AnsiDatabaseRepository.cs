@@ -116,12 +116,14 @@ namespace Mite.Core
                 var split = new Regex(@"\sGO\s", RegexOptions.Multiline);
                 foreach (var sql in split.Split(migration.UpSql))
                 {
-                    var cmd = connection.CreateCommand();
-                    cmd.Transaction = trans;
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
+                    if (!string.IsNullOrEmpty(sql))
+                    {
+                        var cmd = connection.CreateCommand();
+                        cmd.Transaction = trans;
+                        cmd.CommandText = sql;
+                        cmd.ExecuteNonQuery();    
+                    }
                 }
-                
                 IDbCommand migrationCmd = GetMigrationCmd(migration);
                 migrationCmd.Transaction = trans;
                 migrationCmd.ExecuteNonQuery();
@@ -144,10 +146,13 @@ namespace Mite.Core
                 var split = new Regex(@"\sGO\s", RegexOptions.Multiline);
                 foreach (var sql in split.Split(migration.DownSql))
                 {
-                    var cmd = connection.CreateCommand();
-                    cmd.Transaction = trans;
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
+                    if (!string.IsNullOrEmpty(sql))
+                    {
+                        var cmd = connection.CreateCommand();
+                        cmd.Transaction = trans;
+                        cmd.CommandText = sql;
+                        cmd.ExecuteNonQuery();    
+                    }
                 }
 
                 var migrationCmd = connection.CreateCommand();
