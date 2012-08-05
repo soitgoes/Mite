@@ -90,6 +90,11 @@ namespace Mite.Core
             }
         }
 
+        public IEnumerable<Migration> Migrations
+        {
+            get { return this.migrations; }
+        }
+
         public IEnumerable<Migration> InvalidMigrations()
         {
             foreach (var mig in migrations)

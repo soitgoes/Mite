@@ -14,6 +14,7 @@ namespace Mite.Core
         /// <param name="migration"></param>
         MiteDatabase ExecuteUp(Migration migration);
         MiteDatabase ExecuteDown(Migration migration);
+        string DatabaseName { get; set; }
         bool CheckConnection();
         void DropMigrationTable();
         bool MigrationTableExists();

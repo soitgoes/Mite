@@ -31,6 +31,9 @@ namespace Mite.Core
         {
             connection.Dispose();
         }
+
+        
+
         public virtual  bool CheckConnection()
         {
             try
@@ -167,6 +170,12 @@ namespace Mite.Core
             }
             connection.Close();
             return Create();
+        }
+
+        public string DatabaseName
+        {
+            get { return connection.Database; }
+            set { connection.ChangeDatabase(value); }
         }
 
         protected abstract IDbConnection GetConnWithoutDatabaseSpecified();

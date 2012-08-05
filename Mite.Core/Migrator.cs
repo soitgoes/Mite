@@ -14,6 +14,7 @@ namespace Mite.Core
             this.database = database;
             this.databaseRepository = databaseRepository;
         }
+        public IMiteDatabase Database { get { return database; } }
 
         public MigrationResult StepUp()
         {
@@ -66,6 +67,28 @@ namespace Mite.Core
                 databaseRepository.ExecuteUp(mig);
             }
         }
+
+        public bool Verify()
+        {
+            //run all the migrations up then all the migrations down and report any failed migration step
+            var dbName = databaseRepository.DatabaseName; //store temporarily
+            databaseRepository.DatabaseName = "MiteVerify";
+            databaseRepository.CreateDatabase();
+            databaseRepository.Init();
+            var migrations = this.Database.Migrations;
+            for (var i = 0; i < migrations.Count(); i++ )
+            {
+                this.StepUp();
+            }
+            //done stepping up
+            for (var i = 0; i < migrations.Count(); i++ )
+            {
+                this.StepDown();
+            }
+            //done stepping down
+            databaseRepository.DatabaseName = dbName;//restore original db
+        }
+
         public MigrationResult SafeResolution()
         {
             var priorVersion = database.Version;

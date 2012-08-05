@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</ProjectGuid>
+    <ProjectGuid>{F5F81613-1B52-46DA-8D7F-F9B3899A025E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mite.Core</RootNamespace>
-    <AssemblyName>Mite.Core</AssemblyName>
+    <RootNamespace>Mite.Builder</RootNamespace>
+    <AssemblyName>Mite.Builder</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,27 +31,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Libraries\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnsiDatabaseRepository.cs" />
-    <Compile Include="DateTimeHelper.cs" />
-    <Compile Include="IMiteDatabase.cs" />
-    <Compile Include="IDatabaseRepository.cs" />
-    <Compile Include="Migration.cs" />
-    <Compile Include="MigrationDirection.cs" />
-    <Compile Include="MigrationHelper.cs" />
-    <Compile Include="MigrationResult.cs" />
-    <Compile Include="Migrator.cs" />
-    <Compile Include="MiteDatabase.cs" />
-    <Compile Include="MiteException.cs" />
+    <Compile Include="MigratorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Mite.Core\Mite.Core.csproj">
+      <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
+      <Name>Mite.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -12,6 +12,7 @@ namespace Mite.Core
         bool IsMigrationGap();
         bool IsValidState();
         Migration LastValidMigration { get; }
+        IEnumerable<Migration> Migrations { get; }
         IEnumerable<Migration> InvalidMigrations();
         string Version { get; }
         IEnumerable<Migration> ExecutedMigrations { get; }
