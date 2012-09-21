@@ -4,6 +4,11 @@ using Microsoft.Build.Utilities;
 using Mite.Builder;
 
 namespace MsBuildTask {
+
+    /// <summary>
+    /// Mite Ensure verifies that all of the checksums on migrations match what is in the database
+    /// Returns false if they do not.
+    /// </summary>
     public class MiteEnsure : Task {
         public override bool Execute() {
             var migrator = MigratorFactory.GetMigrator(ScriptsDirectory);

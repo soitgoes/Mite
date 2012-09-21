@@ -7,6 +7,10 @@ using Microsoft.Build.Utilities;
 using Mite.Builder;
 
 namespace MsBuildTask {
+
+    /// <summary>
+    /// MiteUpdate brings the database up to the most recent schema
+    /// </summary>
     public class MiteUpdate : Task {
         public override bool Execute() {
             try {
