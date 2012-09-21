@@ -11,6 +11,7 @@ namespace MsBuildTask {
     /// </summary>
     public class MiteEnsure : Task {
         public override bool Execute() {
+            Log.LogMessage("Directory: "  +ScriptsDirectory );
             var migrator = MigratorFactory.GetMigrator(ScriptsDirectory);
             var result = migrator.Tracker.IsValidState();
             if (result)

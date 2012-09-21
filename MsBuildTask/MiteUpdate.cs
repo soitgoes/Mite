@@ -13,6 +13,7 @@ namespace MsBuildTask {
     /// </summary>
     public class MiteUpdate : Task {
         public override bool Execute() {
+            Log.LogMessage("Directory: " + ScriptsDirectory);
             try {
                 var migrator = MigratorFactory.GetMigrator(ScriptsDirectory);
                 var result = migrator.Update();
