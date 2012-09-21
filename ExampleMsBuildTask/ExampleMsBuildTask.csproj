@@ -47,9 +47,9 @@
   <UsingTask TaskName="MsBuildTask.MiteEnsure" AssemblyFile="$(MSBuildProjectDirectory)\..\MsBuildTask\bin\Debug\MsBuildTask.dll" />
   <UsingTask TaskName="MsBuildTask.MiteUpdate" AssemblyFile="$(MSBuildProjectDirectory)\..\MsBuildTask\bin\Debug\MsBuildTask.dll" />
   <Target Name="BeforeBuild">
-    <MiteEnsure ScriptsDirectory="$(MSBuildProjectDirectory)\..\scripts" />
+    <MiteEnsure ScriptsDirectory="$(MSBuildProjectDirectory)\scripts" />
   </Target>
   <Target Name="AfterBuild">
-    <MiteUpdate ScriptsDirectory="$(MSBuildProjectDirectory)\..\scripts" />
+    <MiteUpdate ScriptsDirectory="$(MSBuildProjectDirectory)\scripts" />
   </Target>
 </Project>
