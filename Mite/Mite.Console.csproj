@@ -92,6 +92,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Mite.Builder\Mite.Builder.csproj">
+      <Project>{F5F81613-1B52-46DA-8D7F-F9B3899A025E}</Project>
+      <Name>Mite.Builder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mite.Core\Mite.Core.csproj">
       <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
       <Name>Mite.Core</Name>

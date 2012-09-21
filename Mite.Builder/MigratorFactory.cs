@@ -12,15 +12,23 @@ namespace Mite.Builder {
     public static class MigratorFactory {
         public static Migrator GetMigratorFromConfig(string config, string directoryPath) {
             var databaseRepositories = InstancesOf<IDatabaseRepository>();
-            var jobj = JObject.Parse(config);
-            var repoName = jobj.Value<string>("repositoryName");
-            var connString = jobj.Value<string>("connectionString");
+            var options = JObject.Parse(config);
+            var repoName = options.Value<string>("repositoryName");
+            var connString = options.Value<string>("connectionString");
+
+            if (string.IsNullOrEmpty(repoName)) {
+                throw new Exception("Invalid Config - repositoryName is required.");
+            }
+            if (string.IsNullOrEmpty(connString)) {
+                throw new Exception("Invalid Config - connectionString is requied.");
+            }
             object[] args = new object[]{connString, directoryPath};
             foreach (var repoType in databaseRepositories)
             {
                 if (repoName.ToLower() == repoType.Name.ToLower())
                 {
                     var dynamicRepo = (IDatabaseRepository)Activator.CreateInstance(repoType, BindingFlags.CreateInstance, null, args, null);
+
                     var miteDb = dynamicRepo.Create();
                     return new Migrator(miteDb, dynamicRepo);
                 }                    

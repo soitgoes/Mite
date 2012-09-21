@@ -26,7 +26,7 @@ namespace Mite.MsSql
             
         }
 
-        public override MiteDatabase Init()
+        public override MigrationTracker Init()
         {
             var migrationTableScript =
                 @"/* To prevent any potential data loss issues, you should review this script in detail before running it outside the context of the database designer.*/
@@ -91,7 +91,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return result;
         }
 
-        protected override IDbConnection GetConnWithoutDatabaseSpecified()
+        public override IDbConnection GetConnWithoutDatabaseSpecified()
         {
             var csb = new SqlConnectionStringBuilder(connection.ConnectionString);
             csb["Database"] = "master";
@@ -131,6 +131,18 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
                 result += script + Environment.NewLine;
             serverConn.Disconnect();
             return result;
+        }
+
+        public override void CreateDatabaseIfNotExists()
+        {
+            using (var cnn= GetConnWithoutDatabaseSpecified())
+            {
+                cnn.Open();
+                var cmd = cnn.CreateCommand();
+                cmd.CommandText = string.Format(@"if not exists(select * from sys.databases where name = '{0}') create database {0}", DatabaseName);
+                cmd.ExecuteNonQuery();
+                cnn.Close();    
+            }            
         }
 
         protected override IDbCommand GetMigrationCmd(Migration migration)

@@ -41,15 +41,15 @@
   <ItemGroup>
     <Compile Include="AnsiDatabaseRepository.cs" />
     <Compile Include="DateTimeHelper.cs" />
-    <Compile Include="IMiteDatabase.cs" />
+    <Compile Include="IMigrationTracker.cs" />
     <Compile Include="IDatabaseRepository.cs" />
     <Compile Include="Migration.cs" />
     <Compile Include="MigrationDirection.cs" />
     <Compile Include="MigrationHelper.cs" />
     <Compile Include="MigrationResult.cs" />
     <Compile Include="Migrator.cs" />
-    <Compile Include="MiteDatabase.cs" />
-    <Compile Include="MiteException.cs" />
+    <Compile Include="MigrationTracker.cs" />
+    <Compile Include="MigrationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Data;
 
 namespace Mite.Core
 {
     public interface  IDatabaseRepository :IDisposable
     {
-        MiteDatabase Init();
-        MiteDatabase Create();
+        MigrationTracker Init();
+        MigrationTracker Create();
         bool DatabaseExists();
-        void CreateDatabase();
+        void CreateDatabaseIfNotExists();
         /// <summary>
         /// This method executes the sql for the migration and records the record in the migrations table (it is not responsible for whether or not to execute the migration).
         /// </summary>
         /// <param name="migration"></param>
-        MiteDatabase ExecuteUp(Migration migration);
-        MiteDatabase ExecuteDown(Migration migration);
+        MigrationTracker ExecuteUp(Migration migration);
+        MigrationTracker ExecuteDown(Migration migration);
         string DatabaseName { get; set; }
+        IDbConnection Connection { get; set; }
         bool CheckConnection();
         void DropMigrationTable();
         bool MigrationTableExists();
@@ -25,8 +27,9 @@ namespace Mite.Core
         /// </summary>
         /// <param name="migration"></param>
         /// <returns></returns>
-        MiteDatabase RecordMigration(Migration migration);
+        MigrationTracker RecordMigration(Migration migration);
 
         void DropDatabase();
+        IDbConnection GetConnWithoutDatabaseSpecified();
     }
 }

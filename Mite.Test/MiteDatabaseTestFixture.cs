@@ -21,7 +21,7 @@ namespace Mite.Test
             var hash = new Dictionary<string, string>();
             foreach ( var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             Assert.IsTrue(!db.IsHashMismatch());
             Assert.IsTrue(db.IsValidState());
         }
@@ -33,7 +33,7 @@ namespace Mite.Test
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
             hash["2006"] = "222";
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             Assert.IsFalse(db.IsValidState());
         }
         [Test]
@@ -44,7 +44,7 @@ namespace Mite.Test
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
             migrations.Insert(1, new Migration("2006-01", "fdsw", ""));
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             Assert.IsFalse(db.IsValidState());
         }
         [Test]
@@ -55,7 +55,7 @@ namespace Mite.Test
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
             migrations.Insert(1, new Migration("2006-01", "fdsw", ""));
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             Assert.IsTrue(db.LastValidMigration.Version == "2006");
         }
         [Test]
@@ -66,7 +66,7 @@ namespace Mite.Test
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
             migrations.Insert(1, new Migration("2006-01", "fdsw", ""));
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             Assert.IsTrue(db.ExecutedMigrations.Count() == 2);
         }
         [Test]
@@ -79,7 +79,7 @@ namespace Mite.Test
             var hash = new Dictionary<string, string>();
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             var repoMoq = new Moq.Mock<IDatabaseRepository>();
             int y = 0;
             repoMoq.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Callback((Migration input) => { y++; });
@@ -99,7 +99,7 @@ namespace Mite.Test
             var hash = new Dictionary<string, string>();
             foreach (var mig in migrations)
                 hash.Add(mig.Version, mig.Hash);
-            var db = new MiteDatabase(migrations, hash);
+            var db = new MigrationTracker(migrations, hash);
             Assert.AreEqual(3, db.ExecutedMigrations.Count());
         }
         [Test]
@@ -109,7 +109,7 @@ namespace Mite.Test
                 new Migration("2006", "asdf", ""), 
                 new Migration("2006-01", "98sd98", ""), 
                 new Migration("2007", "fdsa", "") };
-            var db = new MiteDatabase(migrations, null);
+            var db = new MigrationTracker(migrations, null);
             Assert.IsFalse(db.IsMigrationGap());
         }
         [Test]
@@ -121,7 +121,7 @@ namespace Mite.Test
                 new Migration("2007", "fdsa", "") };
             var hashes = new Dictionary<string, string>();
             hashes.Add(migrations[0].Version, migrations[0].Hash);
-            var db = new MiteDatabase(migrations, hashes);
+            var db = new MigrationTracker(migrations, hashes);
             Assert.IsFalse(db.IsMigrationGap());
         }
         //[Test]
@@ -134,7 +134,7 @@ namespace Mite.Test
         //    var hashes = new Dictionary<string, string>();
         //    foreach (var mig in migrations)
         //        hashes.Add(mig.Version, mig.Hash);
-        //    var db = new MiteDatabase(migrations, hashes);
+        //    var db = new MigrationTracker(migrations, hashes);
         //    var repoMock = new Mock<IDatabaseRepository>();
         //    int y = 0;
         //    repoMock.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Returns(db).Callback(() => { y++; });
@@ -146,7 +146,7 @@ namespace Mite.Test
         public void AnEmptyHashListShouldReturnFalseForInvalidHash()
         {
             var migrations = new List<Migration> { new Migration("2006", "asdf", ""), new Migration("2007", "fdsa", "") };
-            var db = new MiteDatabase(migrations, new Dictionary<string, string>());
+            var db = new MigrationTracker(migrations, new Dictionary<string, string>());
             Assert.IsFalse(db.IsHashMismatch());
         }
              

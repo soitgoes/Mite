@@ -1,33 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace Mite.Core
 {
     public class Migrator
     {
-        private IMiteDatabase database;
+        private const string verifyDatabaseName = "MiteVerify";
+        private IMigrationTracker tracker;
         private readonly IDatabaseRepository databaseRepository;
 
-        public Migrator(IMiteDatabase database, IDatabaseRepository databaseRepository)
+        public Migrator(IMigrationTracker tracker, IDatabaseRepository databaseRepository)
         {
-            this.database = database;
+            this.tracker = tracker;
             this.databaseRepository = databaseRepository;
         }
-        public IMiteDatabase Database { get { return database; } }
+        public IMigrationTracker Tracker { get { return tracker; } }
+        public IDatabaseRepository DatabaseRepository { get { return databaseRepository; } }
+        public IDbConnection Connection { get { return databaseRepository.Connection; } }
 
+        
         public MigrationResult StepUp()
         {
-            if (database.IsValidState())
+            if (tracker.IsValidState())
             {
-                var version = this.database.Version;
-                var firstMigration = this.database.UnexcutedMigrations.FirstOrDefault();
+                var version = tracker.Version;
+                var firstMigration = tracker.UnexcutedMigrations.FirstOrDefault();
                 if (firstMigration == null)
                 {
-                    return new MigrationResult(true, "No unexecuted migrations.", version, version);
+                    return new MigrationResult( "No unexecuted migrations.", version, version);
                 }
                 databaseRepository.ExecuteUp(firstMigration);
-                return new MigrationResult(true, version, firstMigration.Version);
+                return new MigrationResult( version, firstMigration.Version);
             }
             else
             {
@@ -36,22 +41,23 @@ namespace Mite.Core
         }
         public MigrationResult StepDown()
         {
-            if (!database.IsValidState())
+            if (!tracker.IsValidState())
                 throw new Exception("Database must be in a valid state before executing a StepDown");
-            var key = this.database.Version;
-            IDictionary<string, Migration> migrationDictionary = this.database.GetMigrationDictionary();
+            var key = tracker.Version;
+            IDictionary<string, Migration> migrationDictionary = tracker.GetMigrationDictionary();
             var migration = migrationDictionary[key];
             var resultingVersion =
                 migrationDictionary.Keys.Where(x => x.CompareTo(key) < 0).OrderByDescending(x => x).FirstOrDefault();
             var resultingMigration = migrationDictionary[resultingVersion];
             if (migration == null)
             {
-                return new MigrationResult(true, "No unexecuted migrations.", migration.Version, migration.Version);
+                return new MigrationResult( "No unexecuted migrations.", Tracker.Version, Tracker.Version);
             }
                 
             databaseRepository.ExecuteDown(migration);
-            return new MigrationResult(true, key, resultingMigration.Version);
+            return new MigrationResult( key, resultingMigration.Version);
         }
+        
 
         public void FromScratch()
         {
@@ -60,78 +66,84 @@ namespace Mite.Core
             {
                 databaseRepository.DropDatabase();
             }
-            databaseRepository.CreateDatabase();
-            database =databaseRepository.Init();
-            foreach (var mig in database.UnexcutedMigrations)
+            databaseRepository.CreateDatabaseIfNotExists();
+            tracker =databaseRepository.Init();
+            foreach (var mig in tracker.UnexcutedMigrations)
             {
                 databaseRepository.ExecuteUp(mig);
             }
-        }
-
+        }   
+        /// <summary>
+        /// In a temporary database migrate all the way up then back down
+        /// </summary>
+        /// <returns></returns>
         public bool Verify()
         {
-            //run all the migrations up then all the migrations down and report any failed migration step
-            var dbName = databaseRepository.DatabaseName; //store temporarily
-            databaseRepository.DatabaseName = "MiteVerify";
-            databaseRepository.CreateDatabase();
-            databaseRepository.Init();
-            var migrations = this.Database.Migrations;
-            for (var i = 0; i < migrations.Count(); i++ )
+            var storeDbName = databaseRepository.Connection.Database;
+            //drop and recreate MiteVerify
+            databaseRepository.Connection.Open();
+            databaseRepository.Connection.ChangeDatabase(verifyDatabaseName);
+            databaseRepository.Connection.Close();
+            databaseRepository.DropDatabase();
+            databaseRepository.CreateDatabaseIfNotExists();
+            var verifier = new Migrator(this.tracker, databaseRepository);
+            try
             {
-                this.StepUp();
-            }
-            //done stepping up
-            for (var i = 0; i < migrations.Count(); i++ )
+                var cnt = verifier.Tracker.Migrations.Count();
+                for (var i = 0; i < cnt; i++)
+                    verifier.StepUp();
+                for (var i = 0; i < cnt; i++)
+                    verifier.StepDown();
+                return true;
+            }finally
             {
-                this.StepDown();
+                databaseRepository.Connection.ChangeDatabase(storeDbName);
             }
-            //done stepping down
-            databaseRepository.DatabaseName = dbName;//restore original db
         }
 
         public MigrationResult SafeResolution()
         {
-            var priorVersion = database.Version;
-            var lastValidMigrationVersion = database.LastValidMigration  == null ?  "" : database.LastValidMigration.Version;
+            var priorVersion = tracker.Version;
+            var lastValidMigrationVersion = tracker.LastValidMigration  == null ?  "" : tracker.LastValidMigration.Version;
             MigrateTo(lastValidMigrationVersion);
-            database = databaseRepository.Create();
+            tracker = databaseRepository.Create();
             Update();
-            database = databaseRepository.Create();
-            return new MigrationResult(true,priorVersion, database.Version ); 
+            tracker = databaseRepository.Create();
+            return new MigrationResult(priorVersion, tracker.Version ); 
         }
 
         public MigrationResult DirtyResolution()
         {
             //run all non-executed transactions
-            var version = database.Version;
-            foreach (var mig in database.UnexcutedMigrations)
+            var version = tracker.Version;
+            foreach (var mig in tracker.UnexcutedMigrations)
             {
                 databaseRepository.ExecuteUp(mig);
             }
-            database = databaseRepository.Create();
-            return new MigrationResult(true, version, database.Version);
+            tracker = databaseRepository.Create();
+            return new MigrationResult( version, tracker.Version);
         }
         public MigrationResult Update()
         {
-            if (!database.IsValidState())
+            if (!tracker.IsValidState())
                 throw new Exception("Database must be in a valid state in order to update it.");
             if (!databaseRepository.DatabaseExists())
                 databaseRepository.Init();
-            var version = database.Version;
-            foreach (var mig in database.UnexcutedMigrations)
+            var version = tracker.Version;
+            foreach (var mig in tracker.UnexcutedMigrations)
             {
                 databaseRepository.ExecuteUp(mig);
             }
-            database = databaseRepository.Create();
-            return new MigrationResult(true, "", version, database.Version);
+            tracker = databaseRepository.Create();
+            return new MigrationResult( "", version, tracker.Version);
         }
 
         public MigrationResult MigrateTo(string destinationVersion)
         {
             
-            string originalVersion = database.Version;
-            bool isUp = database.Version.CompareTo(destinationVersion) < 0;
-            if (isUp && !database.IsValidState())
+            string originalVersion = tracker.Version;
+            bool isUp = tracker.Version.CompareTo(destinationVersion) < 0;
+            if (isUp && !tracker.IsValidState())
                 throw new Exception(
                     "Database must be in a valid state in order to use migrate in the up direction.  Try mite update instead.");
             if (!databaseRepository.MigrationTableExists())
@@ -139,7 +151,7 @@ namespace Mite.Core
             if (isUp)
             {
                 var migrationsToExecute =
-                    database.UnexcutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) <= 0);
+                    tracker.UnexcutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) <= 0);
                 foreach (var mig in migrationsToExecute)
                 {
                     databaseRepository.ExecuteUp(mig);
@@ -148,15 +160,15 @@ namespace Mite.Core
             else
             {
                 var migrationsToExecute =
-                    database.ExecutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) > 0);
+                    tracker.ExecutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) > 0);
                 foreach (var mig in migrationsToExecute)
                 {
                     databaseRepository.ExecuteDown(mig);
                 }
             }
 
-            this.database = databaseRepository.Create();
-            return new MigrationResult(true, "", originalVersion, database.Version);
+            tracker = databaseRepository.Create();
+            return new MigrationResult( "", originalVersion, tracker.Version);
         }
     }
 }
