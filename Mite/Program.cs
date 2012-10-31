@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -116,8 +117,8 @@ namespace Mite
 
                 repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
 
-                
-                if(new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(x => x.Name != "mite.config").ToArray().Count() > 0)
+
+                if (new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(x => !x.Name.Contains("mite.config")).ToArray().Count() > 0)
                 {
                     Console.WriteLine("Working directory is not clean.\nPlease ensure no existing scripts or project files exist when performing init.");
                     return;
@@ -162,10 +163,18 @@ namespace Mite
                         {
                             includeData = true;
                         }
-                        var sql = repo.GenerateSqlScript(includeData);
-                        File.WriteAllText(baseFilePath, sql);
-                        Console.WriteLine(string.Format("{0} generated successfully", baseFileName));
-                        repo.RecordMigration(new Migration(baseFileName, sql, ""));
+                        try
+                        {
+                            var sql = repo.GenerateSqlScript(includeData);
+                            File.WriteAllText(baseFilePath + ".sql", sql);
+                            Console.WriteLine(string.Format("{0} generated successfully", baseFileName));
+                            repo.RecordMigration(new Migration(baseFileName, sql, ""));    
+                        }catch(Win32Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            Console.WriteLine("Using this feature requires that mysqldump be in your path.  Please add the path for mysqldump to your path variable and restart your cmd prompt.");
+                        }
+                        
                     }
                     else
                     {
@@ -379,7 +388,7 @@ namespace Mite
             DirectoryInfo taskDirectory = new DirectoryInfo(Environment.CurrentDirectory);
             
             FileInfo[] proposedFile = new FileInfo[] { new FileInfo(scriptFilename) };
-            FileInfo[] proposedDirectoryContents = taskDirectory.GetFiles().Concat(proposedFile).Where(x => x.Name != "mite.config").ToArray();
+            FileInfo[] proposedDirectoryContents = taskDirectory.GetFiles().Concat(proposedFile).Where(x => !x.Name.Contains("mite.config")).ToArray();
 
             Array.Sort(proposedDirectoryContents, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
             if(proposedDirectoryContents[proposedDirectoryContents.Count()-1].Name != scriptFilename)

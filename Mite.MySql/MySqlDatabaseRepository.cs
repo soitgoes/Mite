@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
@@ -11,6 +12,9 @@ namespace Mite.MySql
 {
     public class MySqlDatabaseRepository : AnsiDatabaseRepository
     {
+        private string user;
+        private string password;
+
         public MySqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
         {
         }
@@ -18,6 +22,17 @@ namespace Mite.MySql
         {
             this.filePath = filePath;
             this.tableName = tableName;
+            this.delimiter = ";\n";
+            var pattern = new Regex("(.*?)(UID|User Id)=(.*?);\\s*?(Password|Pwd)=(.*?)(;|$)", RegexOptions.IgnoreCase);
+            if (pattern.IsMatch(connectionString))
+            {
+                var matches = pattern.Matches(connectionString);
+                user = matches[0].Groups[3].Value;
+                password = matches[0].Groups[5].Value;
+            }else
+            {
+                throw new Exception("Error parsing connection string using pattern: " + "(.*?)(UID|User Id)=(.*?);\\s*?(Password|Pwd)=(.*?)(;|$)");
+            }
             this.connection = new MySqlConnection(connectionString);
         }
 
@@ -78,31 +93,17 @@ namespace Mite.MySql
         public override string GenerateSqlScript(bool includeData)
         {
             var proc = new Process();
-            var info = new ProcessStartInfo("mysqldump");
-            var pattern = new Regex("(UID|User Id)=(.*?);(Password|Pwd)=(.*?)(;|$)", RegexOptions.IgnoreCase);
-            string user = "";
-            string password = "";
-            //if (pattern.IsMatch(connection.ConnectionString))
-            {
-                var matches = pattern.Matches(connection.ConnectionString);
-                user = matches[0].Groups[2].Value;
-                password = matches[0].Groups[4].Value;
-            }
-            /*else
-            {
-                throw new Exception("Could not match connection string pattern UID=(.*?);(Pwd|Password)=(.*?)(;|$)");
-            }
-            */
-            var args = (!includeData ? "--no-data " : "") + "-u"+user+" -p"+password + " " +  connection.Database;
-            info.Arguments = args;
-            info.UseShellExecute = false;
-            info.RedirectStandardInput = true;
-            info.RedirectStandardOutput = true;
-            proc.StartInfo = info;
-            proc.Start();
-            var sql = proc.StandardOutput.ReadToEnd();
-            return sql;
-        }
+                var info = new ProcessStartInfo("mysqldump");
+                var args = (!includeData ? "--no-data " : "") + "-u" + user + " -p" + password + " " + connection.Database;
+                info.Arguments = args;
+                info.UseShellExecute = false;
+                info.RedirectStandardInput = true;
+                info.RedirectStandardOutput = true;
+                proc.StartInfo = info;
+                proc.Start();
+                var sql = proc.StandardOutput.ReadToEnd();
+                return sql;    
+       }
 
     }
 }

@@ -11,6 +11,7 @@ namespace Mite.Core
         protected string tableName;
         protected IDbConnection connection;
         protected string filePath;
+        protected string delimiter = @"\sGO\s";
 
 
         public virtual void DropMigrationTable()
@@ -113,8 +114,9 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
-                var split = new Regex(@"\sGO\s", RegexOptions.Multiline);
-                foreach (var sql in split.Split(migration.UpSql))
+                var split = new Regex(delimiter, RegexOptions.Multiline);
+                var statements = split.Split(migration.UpSql);
+                foreach (var sql in statements)
                 {
                     var cmd = connection.CreateCommand();
                     cmd.Transaction = trans;
@@ -141,7 +143,7 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                var split = new Regex(@"\sGO\s", RegexOptions.Multiline);
+                var split = new Regex(delimiter, RegexOptions.Multiline);
                 foreach (var sql in split.Split(migration.DownSql))
                 {
                     var cmd = connection.CreateCommand();
