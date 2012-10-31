@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Mite.Builder;
 using Mite.Core;
-using Mite.MsSql;
-using Mite.MySql;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -14,7 +13,7 @@ namespace Mite
 {
     class Program
     {
-        private static string miteConfigPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "mite.config";
+        private static readonly string currentDirectory = Environment.CurrentDirectory  ;
         private static IDatabaseRepository repo;
 
         static void Main(string[] args)
@@ -31,7 +30,7 @@ namespace Mite
                 return;
             }
 #if DEBUG
-            Console.WriteLine("Stopped in order to attach debugger.");
+            Console.WriteLine("Stopped in order to attach debugger. Press any key to continue...");
             Console.ReadLine();
 #endif
             if (args[0] == "/?")
@@ -54,7 +53,6 @@ namespace Mite
             }
           if (args[0] == "-c")
             {
-                if (!EnforceConfig()) return;
                 try
                 {
                     if (args.Count() > 1 && !string.IsNullOrEmpty(args[1]))
@@ -77,23 +75,23 @@ namespace Mite
                 
                 
                 return;
-            }
+            }            
             if (args[0] == "init")
             {
                 
-                if (!File.Exists(miteConfigPath))
+                if (!File.Exists(currentDirectory))
                 {
                     Console.WriteLine("What provider are you using?");
-                    Console.WriteLine("[1] MySql.Data.MySqlClient");
-                    Console.WriteLine("[2] System.Data.SqlClient");
-                    string providerName = "";
+                    Console.WriteLine("[1] MySqlDatabaseRepository");
+                    Console.WriteLine("[2] MsSqlDatabaseRepository");
+                    string repositoryName = "";
                     switch (Console.ReadLine()[0])
                     {
                         case '1':
-                            providerName = "MySql.Data.MySqlClient";
+                            repositoryName = "MySqlDatabaseRepository";
                             break;
                         case '2':
-                            providerName = "System.Data.SqlClient";
+                            repositoryName = "MsSqlDatabaseRepository";
                             break;
                         default:
                             Console.WriteLine("Option not recognized");
@@ -106,16 +104,19 @@ namespace Mite
                     //determine the database
 
                     JObject obj = new JObject();
-                    obj["providerName"] = providerName;
+                    obj["repositoryName"] = repositoryName;
                     obj["connectionString"] = connectionString;
-                    File.WriteAllText(miteConfigPath, obj.ToString(Formatting.Indented));
+                    File.WriteAllText(currentDirectory, obj.ToString(Formatting.Indented));
                 
                 }
-                var options = JObject.Parse(File.ReadAllText(miteConfigPath));
-
-                if (!configIsValid(options)) return;
-
-                repo = GetProvider(options.Value<string>("providerName"), options.Value<string>("connectionString"));
+                try
+                {
+                    MigratorFactory.GetMigrator(currentDirectory);    
+                }catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                
 
 
                 if (new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(x => !x.Name.Contains("mite.config")).ToArray().Count() > 0)
@@ -184,14 +185,11 @@ namespace Mite
                 }
                 Console.WriteLine("Nothing to do.  Use mite -c to create your first migration.");
             }
-            var config = JObject.Parse(File.ReadAllText(miteConfigPath));
-            if (!configIsValid(config)) return;
-            repo = GetProvider(config.Value<string>("providerName"), config.Value<string>("connectionString"));
             
-            var database = repo.Create();
-            var migrator = new Migrator(database, repo);
-
-            if (!EnforceConfig()) return;
+            var migrator = MigratorFactory.GetMigrator(currentDirectory);
+            var database = migrator.Tracker;
+            repo = migrator.DatabaseRepository;
+            
             MigrationResult resultingVersion = null;
             switch (args[0])
             {
@@ -277,6 +275,17 @@ namespace Mite
                 case "stepup":
                     resultingVersion = migrator.StepUp();
                     break;
+                case "verify":
+                    try
+                    {
+                        migrator.Verify();
+                        Console.WriteLine("All migrations have been verified and executed successfully");
+                    }catch(MigrationException ex)
+                    {
+                        Console.WriteLine("Migrations could not be verified");           
+                        Console.WriteLine("The " + ex.Direction + " migration failed on: "  + ex.Migration.Version );
+                    }                    
+                    break;
                 case "version":
                     Console.WriteLine("Database Version: " + database.Version);
                     return;
@@ -290,7 +299,7 @@ namespace Mite
                     if (Console.ReadLine() == "y")
                     {
                         repo.DropMigrationTable();
-                        File.Delete(miteConfigPath);
+                        File.Delete(currentDirectory);
                         Console.WriteLine("mite cleaned successfully");
                     }
                     return;
@@ -301,64 +310,12 @@ namespace Mite
             }
         }
 
-        private static bool configIsValid(JObject options)
-        {
-            bool isValid = true;
-            if(string.IsNullOrEmpty(options.Value<string>("providerName")))
-            {
-                Console.Write("Invalid Config - providerName is requied.");
-                isValid = false;
-            }
-            if(string.IsNullOrEmpty(options.Value<string>("connectionString")))
-            {
-                Console.Write("Invalid Config - connectionString is requied.");
-                isValid = false;
-            }
-            return isValid;
-        }
-
-        private static IDatabaseRepository GetProvider(string providerName, string connectionString)
-        {
-            switch (providerName)
-            {
-                case "System.Data.SqlClient":
-                    repo = new MsSqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
-                    break;
-                case "MySql.Data.MySqlClient":
-                    repo = new MySqlDatabaseRepository(connectionString, Environment.CurrentDirectory);
-                    break;
-                default:
-                    Console.WriteLine("Provider not recognized.  Please check your mite.config");
-                    break;
-            }
-            return repo;
-        }
-
         private static void Resolve(Migrator migrator)
         {
             var result = migrator.SafeResolution();
             Console.WriteLine("Resolution Successful");
             Console.WriteLine("Current Database Version: " + result.AfterMigration);
-        }
-
-        private static bool EnforceConfig()
-        {
-            try
-            {
-                GetConnString();
-                return true;
-            }
-            catch (FileNotFoundException)
-            {
-                Console.WriteLine("mite.config expected in current directory");
-                return false;
-            }
-        }
-
-        private static string GetConnString()
-        {
-            return File.ReadAllText(miteConfigPath);
-        }
+        }      
 
         private static string CreateMigration(string scriptFileName = "")
         {
@@ -374,7 +331,7 @@ namespace Mite
                 throw ex;
             }
             var fileName = baseName + ".sql";
-            var fullPath = executingDirectory + Path.DirectorySeparatorChar + fileName;
+            var fullPath = Path.Combine(executingDirectory, fileName);
             var newlines = Environment.NewLine + Environment.NewLine;
             File.WriteAllText(fileName, "/* up */" + newlines + "/* down */" + newlines);
             Console.WriteLine("Creating file '{0}'", fullPath);

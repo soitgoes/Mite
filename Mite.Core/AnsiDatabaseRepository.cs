@@ -13,7 +13,7 @@ namespace Mite.Core
         protected string filePath;
         protected string delimiter = @"\sGO\s";
 
-
+        
         public virtual void DropMigrationTable()
         {
             this.connection.Open();
@@ -26,12 +26,20 @@ namespace Mite.Core
         public abstract bool MigrationTableExists();
         public abstract string GenerateSqlScript(bool includeData);
 
-        public abstract MiteDatabase Init();
+        public abstract MigrationTracker Init();
 
         public void Dispose()
         {
             connection.Dispose();
         }
+
+
+        public IDbConnection Connection
+        {
+            get { return connection; }
+            set { connection = value; }
+        }
+
         public virtual  bool CheckConnection()
         {
             try
@@ -48,10 +56,12 @@ namespace Mite.Core
                 connection.Close();
             }
         }
-        public virtual MiteDatabase Create()
+        public virtual MigrationTracker Create()
         {
+            if (!DatabaseExists())
+                CreateDatabaseIfNotExists();
             var hashes = new Dictionary<string, string>();
-            //read all the migrations from the database and filesystem and create a MiteDatabase
+            //read all the migrations from the database and filesystem and create a MigrationTracker
             //this.DatabaseExists() &&  
             if (this.MigrationTableExists())
             {
@@ -67,12 +77,12 @@ namespace Mite.Core
                 }
                 connection.Close();    
             }
-            return new MiteDatabase(MigrationHelper.ReadFromDirectory(filePath).ToList(), hashes);
+            return new MigrationTracker(MigrationHelper.ReadFromDirectory(filePath).ToList(), hashes);
         }
 
         
 
-        public virtual MiteDatabase RecordMigration(Migration migration)
+        public virtual MigrationTracker RecordMigration(Migration migration)
         {
             if (!MigrationTableExists())
             {
@@ -83,31 +93,25 @@ namespace Mite.Core
             cmd.ExecuteNonQuery();
             connection.Close();
             return Create();
-        }
-        public virtual void CreateDatabase()
-        {
-            using(var conn = GetConnWithoutDatabaseSpecified())
-            {
-                conn.Open();
-                var cmd = conn.CreateCommand();
-                cmd.CommandText = "create database " + connection.Database;
-                cmd.ExecuteNonQuery();
-                conn.Close();
-            }
-        }
+        }       
+        /// <summary>
+        /// Create a database if it doesn't exists.  Throw exception if the database already exists.  Used to create a temporary database for verification
+        /// </summary>
+        public abstract void CreateDatabaseIfNotExists();
+
         public virtual void DropDatabase()
         {
             using (var conn = GetConnWithoutDatabaseSpecified())
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = "drop database " + connection.Database;
+                cmd.CommandText = "drop database " + this.DatabaseName;
                 cmd.ExecuteNonQuery();
                 conn.Close();   
             }
         }
 
-        public virtual  MiteDatabase ExecuteUp(Migration migration)
+        public virtual  MigrationTracker ExecuteUp(Migration migration)
         {
             if (!MigrationTableExists())
                 Init();
@@ -118,12 +122,14 @@ namespace Mite.Core
                 var statements = split.Split(migration.UpSql);
                 foreach (var sql in statements)
                 {
-                    var cmd = connection.CreateCommand();
-                    cmd.Transaction = trans;
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
+                    if (!string.IsNullOrEmpty(sql))
+                    {
+                        var cmd = connection.CreateCommand();
+                        cmd.Transaction = trans;
+                        cmd.CommandText = sql;
+                        cmd.ExecuteNonQuery();    
+                    }
                 }
-                
                 IDbCommand migrationCmd = GetMigrationCmd(migration);
                 migrationCmd.Transaction = trans;
                 migrationCmd.ExecuteNonQuery();
@@ -136,7 +142,7 @@ namespace Mite.Core
         protected abstract IDbCommand GetMigrationCmd(Migration migration);
       
 
-        public virtual MiteDatabase ExecuteDown(Migration migration)
+        public virtual MigrationTracker ExecuteDown(Migration migration)
         {
             if (!MigrationTableExists())
                 Init();
@@ -146,10 +152,13 @@ namespace Mite.Core
                 var split = new Regex(delimiter, RegexOptions.Multiline);
                 foreach (var sql in split.Split(migration.DownSql))
                 {
-                    var cmd = connection.CreateCommand();
-                    cmd.Transaction = trans;
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
+                    if (!string.IsNullOrEmpty(sql))
+                    {
+                        var cmd = connection.CreateCommand();
+                        cmd.Transaction = trans;
+                        cmd.CommandText = sql;
+                        cmd.ExecuteNonQuery();    
+                    }
                 }
 
                 var migrationCmd = connection.CreateCommand();
@@ -166,7 +175,18 @@ namespace Mite.Core
             return Create();
         }
 
-        protected abstract IDbConnection GetConnWithoutDatabaseSpecified();
+        public string DatabaseName
+        {
+            get { return connection.Database; }
+            set
+            {
+                connection.Open();
+                connection.ChangeDatabase(value);
+                connection.Close();
+            }
+        }
+
+        public abstract IDbConnection GetConnWithoutDatabaseSpecified();
 
         public virtual bool DatabaseExists()
         {
@@ -175,7 +195,7 @@ namespace Mite.Core
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = "use " + connection.Database;
+                cmd.CommandText = "use " + DatabaseName;
                 try
                 {
                     cmd.ExecuteNonQuery();

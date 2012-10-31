@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</ProjectGuid>
+    <ProjectGuid>{E79F82AB-79A7-4B3D-9B64-98B409299ED3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mite.Core</RootNamespace>
-    <AssemblyName>Mite.Core</AssemblyName>
+    <RootNamespace>ExampleMsBuildTask</RootNamespace>
+    <AssemblyName>ExampleMsBuildTask</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,31 +32,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnsiDatabaseRepository.cs" />
-    <Compile Include="DateTimeHelper.cs" />
-    <Compile Include="IMigrationTracker.cs" />
-    <Compile Include="IDatabaseRepository.cs" />
-    <Compile Include="Migration.cs" />
-    <Compile Include="MigrationDirection.cs" />
-    <Compile Include="MigrationHelper.cs" />
-    <Compile Include="MigrationResult.cs" />
-    <Compile Include="Migrator.cs" />
-    <Compile Include="MigrationTracker.cs" />
-    <Compile Include="MigrationException.cs" />
+    <Compile Include="ExampleClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <UsingTask TaskName="MsBuildTask.MiteEnsure" AssemblyFile="$(MSBuildProjectDirectory)\..\MsBuildTask\bin\Debug\MsBuildTask.dll" />
+  <UsingTask TaskName="MsBuildTask.MiteUpdate" AssemblyFile="$(MSBuildProjectDirectory)\..\MsBuildTask\bin\Debug\MsBuildTask.dll" />
   <Target Name="BeforeBuild">
+    <MiteEnsure ScriptsDirectory="$(MSBuildProjectDirectory)\scripts" />
   </Target>
   <Target Name="AfterBuild">
+    <MiteUpdate ScriptsDirectory="$(MSBuildProjectDirectory)\scripts" />
   </Target>
-  -->
 </Project>

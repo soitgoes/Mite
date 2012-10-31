@@ -28,3 +28,6 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 Mite.Installation/Mite.Installation/*
+Mite.Installer/Mite.Installer/Express/DVD-5/DiskImages/*
+Mite.Installer/Mite.Installer/Express/DVD-5/LogFiles/*
+Mite.Installer/Mite.Installer/Express/DVD-5/*

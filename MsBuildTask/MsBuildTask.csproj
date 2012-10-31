@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</ProjectGuid>
+    <ProjectGuid>{D62FD3FE-4873-408A-B750-8150943297B8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mite.Core</RootNamespace>
-    <AssemblyName>Mite.Core</AssemblyName>
+    <RootNamespace>MsBuildTask</RootNamespace>
+    <AssemblyName>MsBuildTask</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,27 +31,40 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnsiDatabaseRepository.cs" />
-    <Compile Include="DateTimeHelper.cs" />
-    <Compile Include="IMigrationTracker.cs" />
-    <Compile Include="IDatabaseRepository.cs" />
-    <Compile Include="Migration.cs" />
-    <Compile Include="MigrationDirection.cs" />
-    <Compile Include="MigrationHelper.cs" />
-    <Compile Include="MigrationResult.cs" />
-    <Compile Include="Migrator.cs" />
-    <Compile Include="MigrationTracker.cs" />
-    <Compile Include="MigrationException.cs" />
+    <Compile Include="MiteEnsure.cs" />
+    <Compile Include="MiteUpdate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Mite.Builder\Mite.Builder.csproj">
+      <Project>{F5F81613-1B52-46DA-8D7F-F9B3899A025E}</Project>
+      <Name>Mite.Builder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mite.Core\Mite.Core.csproj">
+      <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
+      <Name>Mite.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mite.MsSql\Mite.MsSql.csproj">
+      <Project>{129F8613-60B3-4D61-8147-723C130E6978}</Project>
+      <Name>Mite.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mite.MySql\Mite.MySql.csproj">
+      <Project>{D25ABB48-5A87-42F0-9B5C-00433AA02664}</Project>
+      <Name>Mite.MySql</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

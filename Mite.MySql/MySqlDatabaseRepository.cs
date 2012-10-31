@@ -37,7 +37,7 @@ namespace Mite.MySql
         }
 
 
-        public override MiteDatabase Init()
+        public override MigrationTracker Init()
         {
             var migrationTableScript =
                 @"CREATE  TABLE `_migrations` (
@@ -54,7 +54,7 @@ namespace Mite.MySql
         }
 
 
-        protected override IDbConnection GetConnWithoutDatabaseSpecified()
+        public override IDbConnection GetConnWithoutDatabaseSpecified()
         {
             //return connection;
             var connString = connection.ConnectionString;
@@ -65,7 +65,16 @@ namespace Mite.MySql
             }
             return new MySqlConnection(connString);
         }
-       
+
+        public override void CreateDatabaseIfNotExists()
+        {
+            connection.Open();
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = string.Format("create database if not exists {0}", DatabaseName);
+            cmd.ExecuteNonQuery();
+            connection.Close();            
+        }
+
         protected override IDbCommand GetMigrationCmd(Migration migration)
         {
             var migrationCmd = (MySqlCommand)connection.CreateCommand();
