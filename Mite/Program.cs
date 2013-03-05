@@ -106,12 +106,12 @@ namespace Mite
                     JObject obj = new JObject();
                     obj["repositoryName"] = repositoryName;
                     obj["connectionString"] = connectionString;
-                    File.WriteAllText(currentDirectory, obj.ToString(Formatting.Indented));
-                
+                    File.WriteAllText(Path.Combine(currentDirectory , "mite.config"), obj.ToString(Formatting.Indented));
                 }
                 try
                 {
-                    MigratorFactory.GetMigrator(currentDirectory);    
+                    var tmpMigrator = MigratorFactory.GetMigrator(currentDirectory);
+                    repo = tmpMigrator.DatabaseRepository;
                 }catch(Exception ex)
                 {
                     Console.WriteLine(ex.Message);
@@ -124,11 +124,7 @@ namespace Mite
                     Console.WriteLine("Working directory is not clean.\nPlease ensure no existing scripts or project files exist when performing init.");
                     return;
                 }
-                if(repo.MigrationTableExists())
-                {
-                    Console.WriteLine("A _migration table already exists.\n'init' should only be used for new setups.\nSee 'mite /?' for help.");
-                    return;
-                }
+              
 
                 var baseFileName = "";
                 try
