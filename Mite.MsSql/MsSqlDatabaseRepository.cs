@@ -121,6 +121,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             scripter.Options.DriAllConstraints = true;
             scripter.Options.DriAll = true;
             scripter.Options.DriAllKeys = true;
+            scripter.Options.Triggers = true;
             scripter.Options.DriIndexes = true;
             scripter.Options.ClusteredIndexes = true;
             scripter.Options.NonClusteredIndexes = true;
