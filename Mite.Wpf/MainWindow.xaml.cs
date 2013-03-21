@@ -86,7 +86,6 @@ namespace Mite.Wpf {
             }
         }
 
-
         private void btnUp_Click(object sender, RoutedEventArgs e)
         {
             try

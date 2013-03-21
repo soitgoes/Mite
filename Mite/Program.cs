@@ -13,20 +13,15 @@ namespace Mite
 {
     class Program
     {
-        private static readonly string currentDirectory = Environment.CurrentDirectory  ;
+        private static readonly string currentDirectory = Environment.CurrentDirectory;
         private static IDatabaseRepository repo;
 
         static void Main(string[] args)
         {
-            
+
             if (args.Length == 0)
             {
                 Console.WriteLine("You must specify an option.  See /? for details");
-                return;
-            }
-            if (args[0] == "-v")
-            {
-                Console.WriteLine("Mite Version " + Assembly.GetExecutingAssembly().GetName().Version);
                 return;
             }
 #if DEBUG
@@ -35,23 +30,31 @@ namespace Mite
 #endif
             if (args[0] == "/?")
             {
-                Console.WriteLine("Mite - Simple and painless SQL migrations.\n\n");
-                Console.WriteLine("mite.exe [-v][init [filename]][-c [filename]][-d [destination]][update/stepup/stepdown]\n\n");
+                Console.WriteLine("Mite - Simple and painless SQL migrations.\n\n"); 
+                Console.WriteLine("Version " + Assembly.GetExecutingAssembly().GetName().Version);
+                Console.WriteLine("mite.exe [-v] [init [filename]] [-c [filename]] [-d [destination]] [update/stepup/stepdown]\n\n");
                 Console.WriteLine("Options are as follows:");
                 Console.WriteLine("-v\t\tReturns the current version of Mite");
                 Console.WriteLine(
-                    "-d\t\tSpecifies the destination version to migrate to.\n\t\t(can be greater than migrations available)");
-                Console.WriteLine("update\t\tRuns all migrations greater than the current version");
-                Console.WriteLine("-c\t\tCreates and launches the new migration files");
-                Console.WriteLine("\t\tfilename(optional): desired filename of migration script");
-                Console.WriteLine("stepup\t\tExecutes one migration file greater than the current version");
-                Console.WriteLine("stepdown\tExecutes one migration file less than the current version");
-                Console.WriteLine(
                     "init\t\tCreates and opens the initial up file and makes.\n\t\tCreates the _migrations table and makes and entry into the \n\t\t_migrations table for the initial up.");
                 Console.WriteLine("\t\tfilename(optional): desired filename of migration script");
+                Console.WriteLine("-c\t\tCreates and launches the new migration files");
+                Console.WriteLine("\t\tfilename(optional): desired filename of migration script");
+                Console.WriteLine(
+                    "-d\t\tSpecifies the destination version to migrate to.\n\t\t(can be greater than migrations available)");
+                Console.WriteLine("update\t\tRuns all migrations greater than the current version");
+                Console.WriteLine("stepup\t\tExecutes one migration file greater than the current version");
+                Console.WriteLine("stepdown\tExecutes one migration file less than the current version");
+
                 return;
             }
-          if (args[0] == "-c")
+
+            if (args[0] == "-v")
+            {
+                Console.WriteLine("Mite Version " + Assembly.GetExecutingAssembly().GetName().Version);
+                return;
+            }
+            if (args[0] == "-c")
             {
                 try
                 {
@@ -68,17 +71,17 @@ namespace Mite
                 {
                     Console.Write(ex.Message);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
-                
-                
+
+
                 return;
-            }            
+            }
             if (args[0] == "init")
             {
-                
+
                 if (!File.Exists(currentDirectory))
                 {
                     Console.WriteLine("What provider are you using?");
@@ -102,21 +105,21 @@ namespace Mite
                     string connectionString = Console.ReadLine();
 
                     //determine the database
-
                     JObject obj = new JObject();
                     obj["repositoryName"] = repositoryName;
                     obj["connectionString"] = connectionString;
-                    File.WriteAllText(Path.Combine(currentDirectory , "mite.config"), obj.ToString(Formatting.Indented));
+                    File.WriteAllText(Path.Combine(currentDirectory, "mite.config"), obj.ToString(Formatting.Indented));
                 }
+
                 try
                 {
                     var tmpMigrator = MigratorFactory.GetMigrator(currentDirectory);
                     repo = tmpMigrator.DatabaseRepository;
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
-                
 
 
                 if (new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(x => !x.Name.Contains("mite.config")).ToArray().Count() > 0)
@@ -124,7 +127,7 @@ namespace Mite
                     Console.WriteLine("Working directory is not clean.\nPlease ensure no existing scripts or project files exist when performing init.");
                     return;
                 }
-              
+
 
                 var baseFileName = "";
                 try
@@ -165,13 +168,14 @@ namespace Mite
                             var sql = repo.GenerateSqlScript(includeData);
                             File.WriteAllText(baseFilePath + ".sql", sql);
                             Console.WriteLine(string.Format("{0} generated successfully", baseFileName));
-                            repo.RecordMigration(new Migration(baseFileName, sql, ""));    
-                        }catch(Win32Exception ex)
+                            repo.RecordMigration(new Migration(baseFileName, sql, ""));
+                        }
+                        catch (Win32Exception ex)
                         {
                             Console.WriteLine(ex.Message);
                             Console.WriteLine("Using this feature requires that mysqldump be in your path.  Please add the path for mysqldump to your path variable and restart your cmd prompt.");
                         }
-                        
+
                     }
                     else
                     {
@@ -181,11 +185,11 @@ namespace Mite
                 }
                 Console.WriteLine("Nothing to do.  Use mite -c to create your first migration.");
             }
-            
+
             var migrator = MigratorFactory.GetMigrator(currentDirectory);
             var database = migrator.Tracker;
             repo = migrator.DatabaseRepository;
-            
+
             MigrationResult resultingVersion = null;
             switch (args[0])
             {
@@ -214,13 +218,13 @@ namespace Mite
                         Console.WriteLine("There is a mismatched checksum in your migrations, would you like me to resolve it? y|N\n This SHOULD NOT be performed in a production environment.");
                         if (Console.Read() == 'y')
                         {
-                            Resolve(migrator);    
+                            Resolve(migrator);
                         }
                     }
                     break;
                 case "-d":
                     var version = "";
-                    if(args.Count() < 2)
+                    if (args.Count() < 2)
                     {
                         Console.WriteLine("ERROR: You have failed to specify a destination version.\nPlease determine your destination version and try again.");
                         return;
@@ -276,11 +280,12 @@ namespace Mite
                     {
                         migrator.Verify();
                         Console.WriteLine("All migrations have been verified and executed successfully");
-                    }catch(MigrationException ex)
+                    }
+                    catch (MigrationException ex)
                     {
-                        Console.WriteLine("Migrations could not be verified");           
-                        Console.WriteLine("The " + ex.Direction + " migration failed on: "  + ex.Migration.Version );
-                    }                    
+                        Console.WriteLine("Migrations could not be verified");
+                        Console.WriteLine("The " + ex.Direction + " migration failed on: " + ex.Migration.Version);
+                    }
                     break;
                 case "version":
                     Console.WriteLine("Database Version: " + database.Version);
@@ -311,18 +316,18 @@ namespace Mite
             var result = migrator.SafeResolution();
             Console.WriteLine("Resolution Successful");
             Console.WriteLine("Current Database Version: " + result.AfterMigration);
-        }      
+        }
 
         private static string CreateMigration(string scriptFileName = "")
         {
             var executingDirectory = Environment.CurrentDirectory;
             string baseName = scriptFileName;
-            
+
             try
             {
                 baseName = GetMigrationFileName(scriptFileName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -339,12 +344,12 @@ namespace Mite
         {
             bool isValid = true;
             DirectoryInfo taskDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-            
+
             FileInfo[] proposedFile = new FileInfo[] { new FileInfo(scriptFilename) };
             FileInfo[] proposedDirectoryContents = taskDirectory.GetFiles().Concat(proposedFile).Where(x => !x.Name.Contains("mite.config")).ToArray();
 
             Array.Sort(proposedDirectoryContents, (x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name));
-            if(proposedDirectoryContents[proposedDirectoryContents.Count()-1].Name != scriptFilename)
+            if (proposedDirectoryContents[proposedDirectoryContents.Count() - 1].Name != scriptFilename)
             {
                 Console.WriteLine("The requested filename is invalid.  Filename must be ASCII greater than all other sql files in directory.\n");
                 isValid = false;
@@ -355,7 +360,7 @@ namespace Mite
         private static string GetMigrationFileName(string scriptFilename = "")
         {
             var migrationScriptFilename = "";
-            if(string.IsNullOrEmpty(scriptFilename))
+            if (string.IsNullOrEmpty(scriptFilename))
             {
                 var now = DateTime.Now;
                 migrationScriptFilename = now.ToIso();
@@ -364,7 +369,7 @@ namespace Mite
             {
                 migrationScriptFilename = scriptFilename;
             }
-            if(!FilenameIsValid(migrationScriptFilename))
+            if (!FilenameIsValid(migrationScriptFilename))
             {
                 throw new FormatException(string.Format("Error: Invalid Filename: {0}", migrationScriptFilename));
             }

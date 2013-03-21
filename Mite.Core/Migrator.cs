@@ -19,8 +19,7 @@ namespace Mite.Core
         public IMigrationTracker Tracker { get { return tracker; } }
         public IDatabaseRepository DatabaseRepository { get { return databaseRepository; } }
         public IDbConnection Connection { get { return databaseRepository.Connection; } }
-
-        
+                
         public MigrationResult StepUp()
         {
             if (tracker.IsValidState())
