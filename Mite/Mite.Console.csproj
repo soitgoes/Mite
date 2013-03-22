@@ -100,14 +100,6 @@
       <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
       <Name>Mite.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mite.MsSql\Mite.MsSql.csproj">
-      <Project>{129F8613-60B3-4D61-8147-723C130E6978}</Project>
-      <Name>Mite.MsSql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mite.MySql\Mite.MySql.csproj">
-      <Project>{D25ABB48-5A87-42F0-9B5C-00433AA02664}</Project>
-      <Name>Mite.MySql</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
