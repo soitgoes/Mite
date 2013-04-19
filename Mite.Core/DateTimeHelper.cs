@@ -6,7 +6,7 @@ namespace Mite.Core
     {
         public static string ToIso(this DateTime input)
         {
-            return input.ToUniversalTime().ToString("yyyy-MM-dd") + "T" + input.ToUniversalTime().ToString("hh-mm-ss") + "Z";
+            return input.ToUniversalTime().ToString("yyyy-MM-dd") + "T" + input.ToUniversalTime().ToString("HH-mm-ss") + "Z";
         }
     }
 }
