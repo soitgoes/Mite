@@ -33,7 +33,7 @@ and to make doing migrations easier than not doing migrations for even the most 
 
 ## Getting Started with Mite on a New Project
 * Download mite from the Downloads section of this site.  https://github.com/soitgoes/Mite/downloads
-* Add the mite install directory to your PATH.   (C:\Program Files\Mite\)
+* Add the mite install directory to your PATH (right click Computer -> Properties -> Advanced System Settings -> Environment Variables).   (C:\Program Files\Mite\)
 * `cd scripts`
 * `mite init`
 
