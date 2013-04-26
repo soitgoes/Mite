@@ -20,7 +20,7 @@ namespace Mite.Builder {
                 throw new Exception("Invalid Config - repositoryName is required.");
             }
             if (string.IsNullOrEmpty(connString)) {
-                throw new Exception("Invalid Config - connectionString is requied.");
+                throw new Exception("Invalid Config - connectionString is required.");
             }
             object[] args = new object[]{connString, directoryPath};
             foreach (var repoType in databaseRepositories)
