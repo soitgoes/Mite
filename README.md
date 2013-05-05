@@ -41,7 +41,6 @@ and to make doing migrations easier than not doing migrations for even the most 
 If you are working on an existing project that uses mite and you do not have a database setup yet:
 
 * Make sure that you have an empty database created and are in your scripts directory.  Then execute the following commands.
-* `mite init`
 * `mite update`
 
 ## Creating your first migration
