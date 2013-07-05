@@ -17,7 +17,8 @@ namespace MsBuildTask {
             try {
                 var migrator = MigratorFactory.GetMigrator(ScriptsDirectory);
                 var result = migrator.Update();
-                Log.LogMessage("Success: " + result.PriorToMigration +" to " + result.AfterMigration);
+                var message = "Success: " + result.PriorToMigration + " to " + result.AfterMigration;
+                Log.LogMessage(MessageImportance.High, message, new object[]{});
                 return true;
             } catch (Exception ex) {
                 Log.LogError(ex.Message);

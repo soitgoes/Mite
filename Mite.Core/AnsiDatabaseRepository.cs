@@ -118,7 +118,7 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
-                var split = new Regex(delimiter, RegexOptions.Multiline);
+                var split = new Regex(delimiter, RegexOptions.Multiline | RegexOptions.IgnoreCase);
                 var statements = split.Split(migration.UpSql);
                 foreach (var sql in statements)
                 {
@@ -149,7 +149,7 @@ namespace Mite.Core
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                var split = new Regex(delimiter, RegexOptions.Multiline);
+                var split = new Regex(delimiter, RegexOptions.Multiline | RegexOptions.IgnoreCase);
                 foreach (var sql in split.Split(migration.DownSql))
                 {
                     if (!string.IsNullOrEmpty(sql))

@@ -8,7 +8,7 @@ namespace Mite.Core
     {
         public static IEnumerable<Migration> ReadFromDirectory(string directoryName)
         {
-            var files = Directory.GetFiles(directoryName);
+            var files = Directory.GetFiles(directoryName, "*.sql",  SearchOption.TopDirectoryOnly);
             var sqlMatch = new Regex("/\\* ?up ?\\*/(.*?)/\\* ?down ?\\*/(.*?)$", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             foreach (var file in files)
