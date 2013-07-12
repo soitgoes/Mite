@@ -23,17 +23,33 @@ namespace Mite.Builder {
                 throw new Exception("Invalid Config - connectionString is required.");
             }
             object[] args = new object[]{connString, directoryPath};
+
+            IDatabaseRepository databaseRepository = null;
+
             foreach (var repoType in databaseRepositories)
             {
                 if (repoName.ToLower() == repoType.Name.ToLower())
                 {
-                    var dynamicRepo = (IDatabaseRepository)Activator.CreateInstance(repoType, BindingFlags.CreateInstance, null, args, null);
-
-                    var miteDb = dynamicRepo.Create();
-                    return new Migrator(miteDb, dynamicRepo);
+                    databaseRepository = (IDatabaseRepository)Activator.CreateInstance(repoType, BindingFlags.CreateInstance, null, args, null);
+                    break;
                 }                    
             }
-            throw new Exception("No database repositories match the name: " + repoName);
+
+            if (databaseRepository == null)
+            {
+                try
+                {
+                    Type repoType = Type.GetType(repoName);
+                    databaseRepository = (IDatabaseRepository)Activator.CreateInstance(repoType, BindingFlags.CreateInstance, null, args, null);
+                }
+                catch (TypeLoadException ex)
+                {
+                    throw new Exception("Could not load repository: " + repoName);
+                }
+            }
+            
+            var miteDb = databaseRepository.Create();
+            return new Migrator(miteDb, databaseRepository);
         }
 
         public static Migrator GetMigrator(string directoryName) {
