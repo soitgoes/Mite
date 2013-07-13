@@ -12,6 +12,7 @@ namespace Mite.MySql
 {
     public class MySqlDatabaseRepository : AnsiDatabaseRepository
     {
+        private string connectionString = "";
         private string user;
         private string password;
 
@@ -33,6 +34,7 @@ namespace Mite.MySql
             {
                 throw new Exception("Error parsing connection string using pattern: " + "(.*?)(UID|User Id)=(.*?);\\s*?(Password|Pwd)=(.*?)(;|$)");
             }
+            this.connectionString = connectionString;
             this.connection = new MySqlConnection(connectionString);
         }
 
@@ -56,14 +58,10 @@ namespace Mite.MySql
 
         public override IDbConnection GetConnWithoutDatabaseSpecified()
         {
-            //return connection;
-            var connString = connection.ConnectionString;
-            var dbPattern = new Regex(@"Database=(.*?)(;|$)", RegexOptions.IgnoreCase);
-            if (dbPattern.IsMatch(connString))
-            {
-                connString  = dbPattern.Replace(connString, "");
-            }
-            return new MySqlConnection(connString);
+            var systemConnection = new MySqlConnection(connectionString);
+            systemConnection.Open();            
+            systemConnection.ChangeDatabase("mysql");
+            return systemConnection;
         }
 
         public override void CreateDatabaseIfNotExists()
