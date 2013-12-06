@@ -14,7 +14,7 @@ and to make doing migrations easier than not doing migrations for even the most 
 * Tested with Mono 2.6.7
 * Tested with .Net 4.0
 
-# Tenants of Mite
+# Tenets of Mite
 
 * SQL is a perfectly good DSL (Domain Specific Language) 
 * Developers know and have tools for SQL.
