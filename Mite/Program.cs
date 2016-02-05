@@ -321,16 +321,7 @@ namespace Mite
         private static string CreateMigration(string scriptFileName = "")
         {
             var executingDirectory = Environment.CurrentDirectory;
-            string baseName = scriptFileName;
-
-            try
-            {
-                baseName = GetMigrationFileName(scriptFileName);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            var baseName = GetMigrationFileName(scriptFileName);
             var fileName = baseName + ".sql";
             var fullPath = Path.Combine(executingDirectory, fileName);
             var newlines = Environment.NewLine + Environment.NewLine;

@@ -122,7 +122,7 @@ namespace Mite.Core
                 var statements = split.Split(migration.UpSql);
                 foreach (var sql in statements)
                 {
-                    if (!string.IsNullOrEmpty(sql))
+                    if (!string.IsNullOrWhiteSpace(sql))
                     {
                         var cmd = connection.CreateCommand();
                         cmd.Transaction = trans;
@@ -193,7 +193,10 @@ namespace Mite.Core
             bool result = false;
             using (var conn = GetConnWithoutDatabaseSpecified())
             {
-                conn.Open();
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();    
+                }
                 var cmd = conn.CreateCommand();
                 cmd.CommandText = "use " + DatabaseName;
                 try
