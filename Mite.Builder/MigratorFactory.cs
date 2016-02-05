@@ -61,6 +61,12 @@ namespace Mite.Builder {
             }
         }
 
+        public static Migrator GetMigrator(IDatabaseRepository databaseRepository, string directoryPath)
+        {
+            var tracker = databaseRepository.Create();
+            return new Migrator(tracker, databaseRepository);
+        }
+
         private static IEnumerable<Type> InstancesOf<T>()
         {
             var executingDirectory= Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
