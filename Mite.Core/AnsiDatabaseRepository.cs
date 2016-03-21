@@ -11,7 +11,7 @@ namespace Mite.Core
         protected string tableName;
         protected IDbConnection connection;
         protected string filePath;
-        protected string delimiter = @"\sGO\s";
+        protected string delimiter = @"^GO";
 
         
         public virtual void DropMigrationTable()
@@ -115,27 +115,42 @@ namespace Mite.Core
         {
             if (!MigrationTableExists())
                 Init();
+
             connection.Open();
+
             using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
                 var split = new Regex(delimiter, RegexOptions.Multiline | RegexOptions.IgnoreCase);
                 var statements = split.Split(migration.UpSql);
+
                 foreach (var sql in statements)
                 {
-                    if (!string.IsNullOrWhiteSpace(sql))
+                    if (string.IsNullOrWhiteSpace(sql))
+                        continue;
+
+                    try
                     {
                         var cmd = connection.CreateCommand();
                         cmd.Transaction = trans;
                         cmd.CommandText = sql;
-                        cmd.ExecuteNonQuery();    
+                        cmd.ExecuteNonQuery();
                     }
+                    catch (Exception)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Fail executing sql -> {0}", sql);
+                        throw;
+                    }
+                    
                 }
-                IDbCommand migrationCmd = GetMigrationCmd(migration);
+
+                var migrationCmd = GetMigrationCmd(migration);
                 migrationCmd.Transaction = trans;
                 migrationCmd.ExecuteNonQuery();
                 trans.Commit();
             }
+
             connection.Close();            ;
+
             return Create();
         }
 
@@ -152,13 +167,13 @@ namespace Mite.Core
                 var split = new Regex(delimiter, RegexOptions.Multiline | RegexOptions.IgnoreCase);
                 foreach (var sql in split.Split(migration.DownSql))
                 {
-                    if (!string.IsNullOrEmpty(sql))
-                    {
-                        var cmd = connection.CreateCommand();
-                        cmd.Transaction = trans;
-                        cmd.CommandText = sql;
-                        cmd.ExecuteNonQuery();    
-                    }
+                    if (string.IsNullOrEmpty(sql))
+                        continue;
+
+                    var cmd = connection.CreateCommand();
+                    cmd.Transaction = trans;
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
                 }
 
                 var migrationCmd = connection.CreateCommand();

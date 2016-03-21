@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
@@ -155,13 +156,22 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             migrationCmd.Parameters.AddWithValue("@hash", migration.Hash);
             return migrationCmd;
         }
+
         public void ExecuteScript(string script)
         {
+            if (string.IsNullOrWhiteSpace(script))
+                return;
+
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                foreach (var sql in script.Split(new string[] { "GO" }, StringSplitOptions.RemoveEmptyEntries))
+                var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline);
+
+                foreach (var sql in scriptParts)
                 {
+                    if (string.IsNullOrWhiteSpace(sql))
+                        continue;
+
                     var cmd = connection.CreateCommand();
                     cmd.Transaction = trans;
                     cmd.CommandText = sql;
