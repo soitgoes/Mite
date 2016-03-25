@@ -2,31 +2,78 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
 using Mite.Core;
+
 namespace Mite.MsSql
 {
+    /// <summary>
+    /// Sql Server Database Repository
+    /// </summary>
+    /// <seealso cref="Mite.Core.AnsiDatabaseRepository" />
     public class MsSqlDatabaseRepository: AnsiDatabaseRepository
     {
+        private const string DefaultMigrationsTable = "_migrations";
         private Server server;
 
-        public MsSqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MsSqlDatabaseRepository"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="filePath">The file path.</param>
+        public MsSqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, DefaultMigrationsTable)
         {            
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MsSqlDatabaseRepository"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="tableName">Name of the table.</param>
         public MsSqlDatabaseRepository(string connectionString, string filePath, string tableName)
         {
             this.filePath = filePath;
             this.tableName = tableName;
-            var connString = new SqlConnectionStringBuilder(connectionString);
-            connString.PersistSecurityInfo = true;
+            var connString = new SqlConnectionStringBuilder(connectionString) {PersistSecurityInfo = true};
             connection = new SqlConnection(){ ConnectionString = connString.ToString()};
-            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MsSqlDatabaseRepository"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="assembly">The assembly.</param>
+        /// <param name="pattern">The pattern.</param>
+        public MsSqlDatabaseRepository(string connectionString, Assembly assembly, string pattern) : this(connectionString, assembly, pattern, DefaultMigrationsTable)
+        {
             
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MsSqlDatabaseRepository"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="assembly">The assembly.</param>
+        /// <param name="pattern">The pattern.</param>
+        /// <param name="tableName">Name of the table.</param>
+        public MsSqlDatabaseRepository(string connectionString, Assembly assembly, string pattern, string tableName)
+        {
+            this.assembly = assembly;
+            this.assemblyPattern = pattern;
+            this.tableName = tableName;
+            var connString = new SqlConnectionStringBuilder(connectionString) { PersistSecurityInfo = true };
+            connection = new SqlConnection() { ConnectionString = connString.ToString() };
+        }
+
+        /// <summary>
+        /// Initializes this instance.
+        /// </summary>
+        /// <returns></returns>
         public override MigrationTracker Init()
         {
             var migrationTableScript =
@@ -76,22 +123,26 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return Create();
         }
 
-      
+
+        /// <summary>
+        /// Migrations the table exists.
+        /// </summary>
+        /// <returns></returns>
         public override bool MigrationTableExists()
         {
-            this.connection.Open();
+            connection.Open();
             var cmd = connection.CreateCommand();
             cmd.CommandText = string.Format(@"SELECT 1 FROM sysobjects WHERE id = object_id(N'[dbo].[{0}]')", tableName);
             var dr = cmd.ExecuteReader();
-            bool result = false;
-            if (dr.Read())
-            {
-                result = true;
-            }
-            this.connection.Close();
+            var result = dr.Read();
+            connection.Close();
             return result;
         }
 
+        /// <summary>
+        /// Gets the connection without database specified.
+        /// </summary>
+        /// <returns></returns>
         public override IDbConnection GetConnWithoutDatabaseSpecified()
         {
             var csb = new SqlConnectionStringBuilder(connection.ConnectionString);
@@ -99,6 +150,11 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return new SqlConnection(csb.ConnectionString);
         }
 
+        /// <summary>
+        /// Generates the SQL script.
+        /// </summary>
+        /// <param name="includeData">if set to <c>true</c> [include data].</param>
+        /// <returns></returns>
         public override string GenerateSqlScript(bool includeData)
         {
             var serverConn = new ServerConnection((SqlConnection)connection);
@@ -135,6 +191,9 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return result;
         }
 
+        /// <summary>
+        /// Create a database if it doesn't exists.  Throw exception if the database already exists.  Used to create a temporary database for verification
+        /// </summary>
         public override void CreateDatabaseIfNotExists()
         {
             using (var cnn= GetConnWithoutDatabaseSpecified())
@@ -147,6 +206,11 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             }            
         }
 
+        /// <summary>
+        /// Gets the migration command.
+        /// </summary>
+        /// <param name="migration">The migration.</param>
+        /// <returns></returns>
         protected override IDbCommand GetMigrationCmd(Migration migration)
         {
 
@@ -157,6 +221,10 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return migrationCmd;
         }
 
+        /// <summary>
+        /// Executes the script.
+        /// </summary>
+        /// <param name="script">The script.</param>
         public void ExecuteScript(string script)
         {
             if (string.IsNullOrWhiteSpace(script))

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace Mite.Core
@@ -12,8 +13,9 @@ namespace Mite.Core
         protected IDbConnection connection;
         protected string filePath;
         protected string delimiter = @"^GO";
+        protected Assembly assembly;
+        protected string assemblyPattern;
 
-        
         public virtual void DropMigrationTable()
         {
             this.connection.Open();
@@ -60,7 +62,9 @@ namespace Mite.Core
         {
             if (!DatabaseExists())
                 CreateDatabaseIfNotExists();
+
             var hashes = new Dictionary<string, string>();
+            
             //read all the migrations from the database and filesystem and create a MigrationTracker
             //this.DatabaseExists() &&  
             if (this.MigrationTableExists())
@@ -77,10 +81,10 @@ namespace Mite.Core
                 }
                 connection.Close();    
             }
-            return new MigrationTracker(MigrationHelper.ReadFromDirectory(filePath).ToList(), hashes);
-        }
 
-        
+            var migrations = (assembly != null) ? MigrationHelper.ReadFromAssembly(assembly, assemblyPattern).ToList() : MigrationHelper.ReadFromDirectory(filePath).ToList();
+            return new MigrationTracker(migrations, hashes);
+        }
 
         public virtual MigrationTracker RecordMigration(Migration migration)
         {
