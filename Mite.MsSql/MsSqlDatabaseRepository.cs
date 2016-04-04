@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
@@ -163,6 +164,27 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
                 return;
 
             connection.Open();
+            var nonTransactionalStatements = new[]
+                {
+                    "ALTER DATABASE", "ALTER FULLTEXT CATALOG", "ALTER FULLTEXT INDEX", "BACKUP", "CREATE DATABASE",
+                    "CREATE FULLTEXT CATALOG", "CREATE FULLTEXT INDEX", "DROP DATABASE", "DROP FULLTEXT CATALOG",
+                    "DROP FULLTEXT INDEX", "RECONFIGURE", "RESTORE"
+                };
+            if (nonTransactionalStatements.Any(x => script.ToUpper().Contains(x)))
+            {
+                var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline);
+
+                foreach (var sql in scriptParts)
+                {
+                    if (string.IsNullOrWhiteSpace(sql))
+                        continue;
+                    var cmd = connection.CreateCommand();
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+                }
+                connection.Close();
+                return;
+            }
             using (var trans = connection.BeginTransaction())
             {
                 var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline);
