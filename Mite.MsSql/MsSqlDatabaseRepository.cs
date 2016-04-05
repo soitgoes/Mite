@@ -158,7 +158,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return migrationCmd;
         }
 
-        public void ExecuteScript(string script)
+        public override void ExecuteScript(string script)
         {
             if (string.IsNullOrWhiteSpace(script))
                 return;

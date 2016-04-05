@@ -111,17 +111,14 @@ namespace Mite.Core
             }
         }
 
-        public virtual  MigrationTracker ExecuteUp(Migration migration)
+        public virtual void ExecuteScript(string script)
         {
-            if (!MigrationTableExists())
-                Init();
-
             connection.Open();
 
             using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
                 var split = new Regex(delimiter, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                var statements = split.Split(migration.UpSql);
+                var statements = split.Split(script);
 
                 foreach (var sql in statements)
                 {
@@ -140,16 +137,31 @@ namespace Mite.Core
                         System.Diagnostics.Debug.WriteLine("Fail executing sql -> {0}", sql);
                         throw;
                     }
-                    
-                }
 
+                }
+            }
+
+            connection.Close();
+        }
+
+        public virtual  MigrationTracker ExecuteUp(Migration migration)
+        {
+            if (!MigrationTableExists())
+                Init();
+
+            ExecuteScript(migration.UpSql);
+
+            connection.Open();
+
+            using (var trans = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
+            {
                 var migrationCmd = GetMigrationCmd(migration);
                 migrationCmd.Transaction = trans;
                 migrationCmd.ExecuteNonQuery();
                 trans.Commit();
             }
 
-            connection.Close();            ;
+            connection.Close();
 
             return Create();
         }
@@ -161,21 +173,12 @@ namespace Mite.Core
         {
             if (!MigrationTableExists())
                 Init();
+
+            ExecuteScript(migration.DownSql);
+
             connection.Open();
             using (var trans = connection.BeginTransaction())
             {
-                var split = new Regex(delimiter, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                foreach (var sql in split.Split(migration.DownSql))
-                {
-                    if (string.IsNullOrEmpty(sql))
-                        continue;
-
-                    var cmd = connection.CreateCommand();
-                    cmd.Transaction = trans;
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
-                }
-
                 var migrationCmd = connection.CreateCommand();
                 migrationCmd.Transaction = trans;
                 migrationCmd.CommandText = string.Format("delete from {0} where [key] = @version", tableName);
