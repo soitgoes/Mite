@@ -46,7 +46,7 @@ namespace Mite.Core
 
         public bool IsValidState()
         {
-            return !IsMigrationGap() && !IsHashMismatch();
+            return !IsHashMismatch();
         }
 
         public bool CanGoUp { get { return IsValidState() && this.UnexcutedMigrations.Count() > 0; } }
