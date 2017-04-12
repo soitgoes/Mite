@@ -84,11 +84,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             var cmd = connection.CreateCommand();
             cmd.CommandText = string.Format(@"SELECT 1 FROM sysobjects WHERE id = object_id(N'[dbo].[{0}]')", tableName);
             var dr = cmd.ExecuteReader();
-            bool result = false;
-            if (dr.Read())
-            {
-                result = true;
-            }
+            bool result = dr.Read();
             this.connection.Close();
             return result;
         }
@@ -172,7 +168,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
                 };
             if (nonTransactionalStatements.Any(x => script.ToUpper().Contains(x)))
             {
-                var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline);
+                var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
                 foreach (var sql in scriptParts)
                 {
@@ -187,7 +183,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             }
             using (var trans = connection.BeginTransaction())
             {
-                var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline);
+                var scriptParts = Regex.Split(script, "^GO", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
                 foreach (var sql in scriptParts)
                 {
