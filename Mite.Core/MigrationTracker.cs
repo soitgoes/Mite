@@ -49,7 +49,7 @@ namespace Mite.Core
             return !IsMigrationGap() && !IsHashMismatch();
         }
 
-        public bool CanGoUp { get { return IsValidState() && this.UnexcutedMigrations.Count() > 0; } }
+        public bool CanGoUp { get { return IsValidState() && this.UnexcutedMigrations.Any(); } }
         public bool CanGoDown { get { return IsValidState() && this.UnexcutedMigrations.Count() != this.migrations.Count(); } }
 
         public Migration LastValidMigration

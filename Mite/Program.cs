@@ -122,7 +122,7 @@ namespace Mite
                 }
 
 
-                if (new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Where(x => !x.Name.Contains("mite.config")).ToArray().Count() > 0)
+                if (new DirectoryInfo(Environment.CurrentDirectory).GetFiles().Any(x => !x.Name.Contains("mite.config")))
                 {
                     Console.WriteLine("Working directory is not clean.\nPlease ensure no existing scripts or project files exist when performing init.");
                     return;
@@ -196,7 +196,7 @@ namespace Mite
                 case "update":
                     if (database.IsValidState())
                     {
-                        if (database.UnexcutedMigrations.Count() == 0)
+                        if (!database.UnexcutedMigrations.Any())
                         {
                             Console.WriteLine("No migrations to execute");
                             Console.WriteLine("Current Version: " + database.Version);
@@ -237,7 +237,7 @@ namespace Mite
                     Console.WriteLine("Current Version:" + database.Version);
                     if (database.IsValidState())
                     {
-                        if (database.UnexcutedMigrations.Count() == 0)
+                        if (!database.UnexcutedMigrations.Any())
                         {
                             Console.WriteLine("No migrations to execute");
                             return;
