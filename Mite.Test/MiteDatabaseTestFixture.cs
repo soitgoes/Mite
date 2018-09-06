@@ -149,6 +149,8 @@ namespace Mite.Test
             var db = new MigrationTracker(migrations, new Dictionary<string, string>());
             Assert.IsFalse(db.IsHashMismatch());
         }
-             
+
+       
+
     }
 }
