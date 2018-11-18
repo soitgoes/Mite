@@ -251,7 +251,7 @@ namespace Mite
                             Console.WriteLine("The following migrations don't match their checksums:");
                             foreach (var mig in invalidMigrations)
                             {
-                                Console.WriteLine(mig.Version);
+                                Console.WriteLine(mig.Version +  " [" + mig.Hash + "]");
                             }
                             return;
                         }

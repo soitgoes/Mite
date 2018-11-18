@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mite.Console", "Mite\Mite.Console.csproj", "{0D646057-57A0-4C3A-BC8C-96840C9EE9F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mite.Test", "Mite.Test\Mite.Test.csproj", "{0F3BA261-047B-4025-BC67-21D93EC1EC93}"
@@ -374,7 +376,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{E79F82AB-79A7-4B3D-9B64-98B409299ED3} = {A1EDB2E6-C8DB-4E4B-B65C-5C4FC89EEC1C}
 		{D62FD3FE-4873-408A-B750-8150943297B8} = {A1EDB2E6-C8DB-4E4B-B65C-5C4FC89EEC1C}
+		{E79F82AB-79A7-4B3D-9B64-98B409299ED3} = {A1EDB2E6-C8DB-4E4B-B65C-5C4FC89EEC1C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B93DDDC0-BDD3-420C-AD00-787C03FE158F}
 	EndGlobalSection
 EndGlobal

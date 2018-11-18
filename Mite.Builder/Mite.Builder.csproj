@@ -51,6 +51,14 @@
       <Project>{EEB7F868-CB07-4DB3-939A-2F342EACBA9F}</Project>
       <Name>Mite.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mite.MsSql\Mite.MsSql.csproj">
+      <Project>{129f8613-60b3-4d61-8147-723c130e6978}</Project>
+      <Name>Mite.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mite.MySql\Mite.MySql.csproj">
+      <Project>{d25abb48-5a87-42f0-9b5c-00433aa02664}</Project>
+      <Name>Mite.MySql</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
