@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mite.Core;
-using Moq;
 using NUnit.Framework;
 
 namespace Mite.Test
@@ -14,6 +13,9 @@ namespace Mite.Test
         {
             
         }
+
+       
+        
         [Test]
         public void ShouldBeValidStateIfAllHashesAreTheSame()
         {
@@ -36,6 +38,19 @@ namespace Mite.Test
             var db = new MigrationTracker(migrations, hash);
             Assert.IsFalse(db.IsValidState());
         }
+        
+        [Test]
+        public void GapShouldBeValidIfPermissiveIsTrue()
+        {
+            var migrations = new List<Migration> { new Migration("2006", "asdf", ""), new Migration("2007", "fdsa", "") };
+            var hash = new Dictionary<string, string>();
+            foreach (var mig in migrations)
+                hash.Add(mig.Version, mig.Hash);
+            migrations.Insert(1, new Migration("2006-01", "fdsw", ""));
+            var db = new MigrationTracker(migrations, hash, true);
+            Assert.IsTrue(db.IsValidState());
+        }
+        
         [Test]
         public void ShouldNotBeValidIfThereIsAMigrationGap()
         {
@@ -69,26 +84,26 @@ namespace Mite.Test
             var db = new MigrationTracker(migrations, hash);
             Assert.IsTrue(db.ExecutedMigrations.Count() == 2);
         }
-        [Test]
-        public void MigrateToShouldExecuteDownTwice()
-        {
-            var migrations = new List<Migration> { 
-                new Migration("2006", "asdf", ""), 
-                new Migration("2006-01", "98sd98", ""), 
-                new Migration("2007", "fdsa", "") };
-            var hash = new Dictionary<string, string>();
-            foreach (var mig in migrations)
-                hash.Add(mig.Version, mig.Hash);
-            var db = new MigrationTracker(migrations, hash);
-            var repoMoq = new Moq.Mock<IDatabaseRepository>();
-            int y = 0;
-            repoMoq.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Callback((Migration input) => { y++; });
-            repoMoq.Setup(x => x.Create()).Returns(db);
+        //[Test]
+        //public void MigrateToShouldExecuteDownTwice()
+        //{
+        //    var migrations = new List<Migration> { 
+        //        new Migration("2006", "asdf", ""), 
+        //        new Migration("2006-01", "98sd98", ""), 
+        //        new Migration("2007", "fdsa", "") };
+        //    var hash = new Dictionary<string, string>();
+        //    foreach (var mig in migrations)
+        //        hash.Add(mig.Version, mig.Hash);
+        //    var db = new MigrationTracker(migrations, hash);
+        //    var repoMoq = new Moq.Mock<IDatabaseRepository>();
+        //    int y = 0;
+        //    repoMoq.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Callback((Migration input) => { y++; });
+        //    repoMoq.Setup(x => x.Create()).Returns(db);
 
-            var migrator = new Migrator(db, repoMoq.Object);
-            migrator.MigrateTo("2006");
-            Assert.IsTrue(y== 2, "ExecuteDown should be called two times but is called " + y.ToString());            
-        }
+        //    var migrator = new Migrator(db, repoMoq.Object);
+        //    migrator.MigrateTo("2006");
+        //    Assert.IsTrue(y== 2, "ExecuteDown should be called two times but is called " + y.ToString());            
+        //}
         [Test]
         public void ExecutedMigrationsShouldBePopulated()
         {

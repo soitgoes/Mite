@@ -4,16 +4,12 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Sdk.Sfc;
-using Microsoft.SqlServer.Management.Smo;
 using Mite.Core;
+
 namespace Mite.MsSql
 {
     public class MsSqlDatabaseRepository: AnsiDatabaseRepository
     {
-        private Server server;
-
         public MsSqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
         {            
         }
@@ -96,41 +92,41 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
             return new SqlConnection(csb.ConnectionString);
         }
 
-        public override string GenerateSqlScript(bool includeData)
-        {
-            var serverConn = new ServerConnection((SqlConnection)connection);
-            server = new Server(serverConn);
-            var db = new Database(server, connection.Database);
-            List<Urn> list = new List<Urn>();
-            DataTable dataTable = db.EnumObjects(DatabaseObjectTypes.Table);
-            foreach (DataRow row in dataTable.Rows)
-            {
-                list.Add(new Urn((string)row["Urn"]));
-            }
+        //public override string GenerateSqlScript(bool includeData)
+        //{
+        //    var serverConn = new ServerConnection((SqlConnection)connection);
+        //    server = new Server(serverConn);
+        //    var db = new Database(server, connection.Database);
+        //    List<Urn> list = new List<Urn>();
+        //    DataTable dataTable = db.EnumObjects(DatabaseObjectTypes.Table);
+        //    foreach (DataRow row in dataTable.Rows)
+        //    {
+        //        list.Add(new Urn((string)row["Urn"]));
+        //    }
 
-            Scripter scripter = new Scripter();
-            scripter.Server = server;
-            scripter.Options.IncludeDatabaseContext = false;
-            scripter.Options.IncludeHeaders = true;
-            scripter.Options.SchemaQualify = true;
-            scripter.Options.ScriptData = includeData;            
-            scripter.Options.SchemaQualifyForeignKeysReferences = true;
-            scripter.Options.NoCollation = true;
-            scripter.Options.DriAllConstraints = true;
-            scripter.Options.DriAll = true;
-            scripter.Options.DriAllKeys = true;
-            scripter.Options.Triggers = true;
-            scripter.Options.DriIndexes = true;
-            scripter.Options.ClusteredIndexes = true;
-            scripter.Options.NonClusteredIndexes = true;
-            scripter.Options.ToFileOnly = false;
-            var scripts = scripter.EnumScript(list.ToArray());
-            string result = "";
-            foreach (var script in scripts)
-                result += script + Environment.NewLine;
-            serverConn.Disconnect();
-            return result;
-        }
+        //    Scripter scripter = new Scripter();
+        //    scripter.Server = server;
+        //    scripter.Options.IncludeDatabaseContext = false;
+        //    scripter.Options.IncludeHeaders = true;
+        //    scripter.Options.SchemaQualify = true;
+        //    scripter.Options.ScriptData = includeData;            
+        //    scripter.Options.SchemaQualifyForeignKeysReferences = true;
+        //    scripter.Options.NoCollation = true;
+        //    scripter.Options.DriAllConstraints = true;
+        //    scripter.Options.DriAll = true;
+        //    scripter.Options.DriAllKeys = true;
+        //    scripter.Options.Triggers = true;
+        //    scripter.Options.DriIndexes = true;
+        //    scripter.Options.ClusteredIndexes = true;
+        //    scripter.Options.NonClusteredIndexes = true;
+        //    scripter.Options.ToFileOnly = false;
+        //    var scripts = scripter.EnumScript(list.ToArray());
+        //    string result = "";
+        //    foreach (var script in scripts)
+        //        result += script + Environment.NewLine;
+        //    serverConn.Disconnect();
+        //    return result;
+        //}
 
         public override void CreateDatabaseIfNotExists()
         {
@@ -198,6 +194,11 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
                 trans.Commit();
             }
             connection.Close();
+        }
+
+        public override string GenerateSqlScript(bool includeData)
+        {
+            throw new NotImplementedException();
         }
     }
 }

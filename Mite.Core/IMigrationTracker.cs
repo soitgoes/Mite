@@ -9,7 +9,7 @@ namespace Mite.Core
     /// </summary>
     public interface IMigrationTracker
     {
-        IEnumerable<Migration> MigrationsSince(DateTime dateTime);
+       //IEnumerable<Migration> MigrationsSince(DateTime dateTime);
         IEnumerable<Migration> UnexcutedMigrations { get; }
         bool IsHashMismatch();
         bool IsMigrationGap();
@@ -17,6 +17,7 @@ namespace Mite.Core
         bool CanGoUp { get; }
         bool CanGoDown { get; }
         
+        bool Permissive { get; set; }
         Migration LastValidMigration { get; }
         IEnumerable<Migration> Migrations { get; }
         IEnumerable<Migration> InvalidMigrations();

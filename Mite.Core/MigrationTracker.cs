@@ -10,18 +10,25 @@ namespace Mite.Core
     /// </summary>
     public class MigrationTracker : IMigrationTracker
     {
+        private bool _permissive;
         private readonly IList<Migration> migrations;
         private readonly IDictionary<string, string> hashes;
 
-        public MigrationTracker(IEnumerable<Migration> migrations, IDictionary<string, string> hashes)
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="migrations"></param>
+        /// <param name="hashes"></param>
+        /// <param name="permissive">If true will allow for a skipped migration to be executed</param>
+        public MigrationTracker(IEnumerable<Migration> migrations, IDictionary<string, string> hashes, bool permissive=false)
         {
+            this._permissive = permissive;
             this.migrations = migrations.OrderBy(x => x.Version).ToList();
             this.hashes = hashes ?? new Dictionary<string, string>();
         }
-        public IEnumerable<Migration> MigrationsSince(DateTime dateTime)
-        {
-            return UnexcutedMigrations.Where(x => x.Version.CompareTo(dateTime.ToIso()) > 0);
-        }
+       
         public IEnumerable<Migration> UnexcutedMigrations
         {
             get { return migrations.Where(x => !hashes.ContainsKey(x.Version)).OrderBy(x => x.Version); }
@@ -46,11 +53,19 @@ namespace Mite.Core
 
         public bool IsValidState()
         {
-            return !IsMigrationGap() && !IsHashMismatch();
+            var misMatch = IsHashMismatch();
+            var isGap = IsMigrationGap();
+            var result = !misMatch && (_permissive || !isGap);
+            return result;
         }
 
         public bool CanGoUp { get { return IsValidState() && this.UnexcutedMigrations.Any(); } }
         public bool CanGoDown { get { return IsValidState() && this.UnexcutedMigrations.Count() != this.migrations.Count(); } }
+        public bool Permissive
+        {
+            get => _permissive;
+            set => _permissive = value;
+        }
 
         public Migration LastValidMigration
         {
@@ -81,6 +96,11 @@ namespace Mite.Core
         public IEnumerable<Migration> InvalidMigrations()
         {
             return from mig in migrations where hashes.ContainsKey(mig.Version) let hash = hashes[mig.Version] where hash != mig.Hash select mig;
+        }
+
+        public IEnumerable<Migration> MigrationsSince(DateTime dateTime)
+        {
+            throw new NotImplementedException();
         }
 
         public string Version

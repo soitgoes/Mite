@@ -24,10 +24,6 @@ namespace Mite
                 Console.WriteLine("You must specify an option.  See /? for details");
                 return;
             }
-#if DEBUG
-            Console.WriteLine("Stopped in order to attach debugger. Press any key to continue...");
-            Console.ReadLine();
-#endif
             if (args[0] == "/?")
             {
                 Console.WriteLine("Mite - Simple and painless SQL migrations.\n\n"); 
