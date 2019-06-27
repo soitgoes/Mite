@@ -50,7 +50,7 @@ namespace Mite
                 Console.WriteLine("Mite Version " + Assembly.GetExecutingAssembly().GetName().Version);
                 return;
             }
-            if (args[0] == "-c")
+            if (args[0] == "create")
             {
                 try
                 {
