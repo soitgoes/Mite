@@ -41,18 +41,17 @@ namespace Mite.Core
         }
         public MigrationResult StepDown()
         {
-            if (!tracker.IsValidState())
-                throw new Exception("Database must be in a valid state before executing a StepDown");
             var key = tracker.Version;
-            IDictionary<string, Migration> migrationDictionary = tracker.GetMigrationDictionary();
-            var migration = migrationDictionary[key];
-            var resultingVersion =
-                migrationDictionary.Keys.Where(x => x.CompareTo(key) < 0).OrderByDescending(x => x).FirstOrDefault();
-            var resultingMigration = migrationDictionary[resultingVersion];
+            var migrationDictionary = tracker.GetMigrationDictionary();
+            var migration = migrationDictionary.ContainsKey(key) ? migrationDictionary[key] : null;
             if (migration == null)
             {
                 return new MigrationResult( "No unexecuted migrations.", Tracker.Version, Tracker.Version);
             }
+            var resultingVersion =
+                migrationDictionary.Keys.Where(x => x.CompareTo(key) < 0).OrderByDescending(x => x).FirstOrDefault();
+            var resultingMigration = migrationDictionary[resultingVersion];
+          
                 
             databaseRepository.ExecuteDown(migration);
             return new MigrationResult( key, resultingMigration.Version);
@@ -148,13 +147,16 @@ namespace Mite.Core
                     "Database must be in a valid state in order to use migrate in the up direction.  Try mite update instead.");
             if (!databaseRepository.MigrationTableExists())
                 databaseRepository.Init();
+            var version = "";
             if (isUp)
             {
                 var migrationsToExecute =
                     tracker.UnexcutedMigrations.Where(x => x.Version.CompareTo(destinationVersion) <= 0);
                 foreach (var mig in migrationsToExecute)
                 {
+                    
                     databaseRepository.ExecuteUp(mig);
+                    version = mig.Version;
                 }
             }
             else
@@ -164,11 +166,12 @@ namespace Mite.Core
                 foreach (var mig in migrationsToExecute)
                 {
                     databaseRepository.ExecuteDown(mig);
+                    version = mig.Version;
                 }
             }
 
-            tracker = databaseRepository.Create();
-            return new MigrationResult( "", originalVersion, tracker.Version);
+           
+            return new MigrationResult( "", originalVersion, version);
         }
     }
 }

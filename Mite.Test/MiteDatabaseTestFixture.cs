@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mite.Core;
+using Moq;
 using NUnit.Framework;
 
 namespace Mite.Test
@@ -14,7 +15,18 @@ namespace Mite.Test
             
         }
 
-       
+        [Test]
+        public void ShouldAllowStepDownWhenDirty()
+        {
+            var dbRepo = new Mock<IDatabaseRepository>();
+            var tracker = new Mock<IMigrationTracker>();
+            tracker.Setup(t => t.Version).Returns("1.0.0");
+            tracker.Setup(t => t.IsValidState()).Returns(false);
+            tracker.Setup(t => t.GetMigrationDictionary()).Returns(new Dictionary<string, Migration>());
+            var migrator = new Migrator(tracker.Object, dbRepo.Object);
+            migrator.StepDown();
+            Assert.True(true, "Step up should not require that the database be clean");
+        }
         
         [Test]
         public void ShouldBeValidStateIfAllHashesAreTheSame()
@@ -139,28 +151,32 @@ namespace Mite.Test
             var db = new MigrationTracker(migrations, hashes);
             Assert.IsFalse(db.IsMigrationGap());
         }
-        //[Test]
-        //public void DownMigrationShouldExecuteToVersionSpecified()
-        //{
-        //    var migrations = new List<Migration> { 
-        //        new Migration("2006", "asdf", ""), 
-        //        new Migration("2006-01", "98sd98", ""), 
-        //        new Migration("2007", "fdsa", "") };
-        //    var hashes = new Dictionary<string, string>();
-        //    foreach (var mig in migrations)
-        //        hashes.Add(mig.Version, mig.Hash);
-        //    var db = new MigrationTracker(migrations, hashes);
-        //    var repoMock = new Mock<IDatabaseRepository>();
-        //    int y = 0;
-        //    repoMock.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Returns(db).Callback(() => { y++; });
-        //    var migrator = new Migrator(db, repoMock.Object);
-        //    migrator.MigrateTo("2006");
-        //    Assert.AreEqual(y, 2);
-        //}
+        [Test]
+        public void DownMigrationShouldExecuteToVersionSpecified()
+        {
+            var migrations = new List<Migration> { 
+                new Migration("2006", "asdf", ""), 
+                new Migration("2006-01", "98sd98", ""), 
+                new Migration("2007", "fdsa", "") };
+            var hashes = new Dictionary<string, string>();
+            foreach (var mig in migrations)
+                hashes.Add(mig.Version, mig.Hash);
+            var db = new MigrationTracker(migrations, hashes);
+            var repoMock = new Mock<IDatabaseRepository>();
+            int y = 0;
+            repoMock.Setup(x => x.ExecuteDown(It.IsAny<Migration>())).Returns(db).Callback(() => { y++; });
+            var migrator = new Migrator(db, repoMock.Object);
+            migrator.MigrateTo("2006");
+            Assert.AreEqual(y, 2);
+        }
         [Test]
         public void AnEmptyHashListShouldReturnFalseForInvalidHash()
         {
-            var migrations = new List<Migration> { new Migration("2006", "asdf", ""), new Migration("2007", "fdsa", "") };
+            var migrations = new List<Migration>
+            {
+                new Migration("2006", "asdf", ""), 
+                new Migration("2007", "fdsa", "")
+            };
             var db = new MigrationTracker(migrations, new Dictionary<string, string>());
             Assert.IsFalse(db.IsHashMismatch());
         }

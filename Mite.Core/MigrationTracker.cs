@@ -12,7 +12,7 @@ namespace Mite.Core
     {
         private bool _permissive;
         private readonly IList<Migration> migrations;
-        private readonly IDictionary<string, string> hashes;
+        private readonly IDictionary<string, string> hashes = new Dictionary<string, string>();
 
 
 
