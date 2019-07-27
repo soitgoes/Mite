@@ -35,3 +35,4 @@ Mite.Installer/Mite.Installer/Express/*
 /.vs/*
 Mite.Core/.idea
 .idea
+/packages/*

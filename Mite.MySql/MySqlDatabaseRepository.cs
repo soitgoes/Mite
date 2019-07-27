@@ -53,7 +53,6 @@ namespace Mite.MySql
             return Create();
         }
 
-
         public override IDbConnection GetConnWithoutDatabaseSpecified()
         {
             var systemConnection = new MySqlConnection(connectionString);
@@ -75,8 +74,8 @@ namespace Mite.MySql
         {
             var migrationCmd = (MySqlCommand)connection.CreateCommand();
             migrationCmd.CommandText = string.Format("insert into {0} VALUES(?key, ?hash)", tableName);
-            migrationCmd.Parameters.Add("?key", migration.Version);
-            migrationCmd.Parameters.Add("?hash", migration.Hash);
+            migrationCmd.Parameters.AddWithValue("key", migration.Version);
+            migrationCmd.Parameters.AddWithValue("hash", migration.Hash);
             return migrationCmd;
         }
 
