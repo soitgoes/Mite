@@ -79,8 +79,36 @@ namespace Mite.Core
             }
             return new MigrationTracker(MigrationHelper.ReadFromDirectory(filePath).ToList(), hashes);
         }
-
-
+      
+        public virtual void WriteHash(Migration migration)
+        {
+            try
+            {
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = $"update {tableName} set `hash`='{migration.Hash}' where `key`='{migration.Version}'";
+                //TODO: Fix sql injection possibility
+                //cmd.CommandText = $"update {tableName} set `hash`=@hash where `key`=@key";
+                //var hashParam = cmd.CreateParameter();
+                //hashParam.Value = migration.Hash;
+                //hashParam.ParameterName = "@hash";
+                //hashParam.DbType = DbType.String;
+                //var keyParam = cmd.CreateParameter();
+                //keyParam.ParameterName = "@key";
+                //keyParam.Value = migration.Hash;
+                //keyParam.DbType = DbType.String;
+                //cmd.Parameters.Add(hashParam);
+                //cmd.Parameters.Add(keyParam);
+                Console.WriteLine(cmd.CommandText);
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+           
+        }
+        
 
         public virtual MigrationTracker RecordMigration(Migration migration)
         {
@@ -149,7 +177,7 @@ namespace Mite.Core
                 trans.Commit();
             }
 
-            connection.Close(); ;
+            connection.Close();
 
             return Create();
         }
@@ -237,6 +265,15 @@ namespace Mite.Core
             {
                 return true; //assume it does and proceed.
             }
+        }
+
+        public void ForceWriteMigration(Migration migration)
+        {
+            connection.Open();
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"insert into {tableName} (`key`, `hash`) values('{migration.Version}', '{migration.Hash}')";
+            cmd.ExecuteNonQuery();
+            connection.Close();
         }
     }
 }

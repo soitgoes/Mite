@@ -31,5 +31,7 @@ namespace Mite.Core
 
         void DropDatabase();
         IDbConnection GetConnWithoutDatabaseSpecified();
+        void WriteHash(Migration migration);
+        void ForceWriteMigration(Migration migration);
     }
 }

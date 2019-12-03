@@ -95,7 +95,10 @@ namespace Mite.Core
 
         public IEnumerable<Migration> InvalidMigrations()
         {
-            return from mig in migrations where hashes.ContainsKey(mig.Version) let hash = hashes[mig.Version] where hash != mig.Hash select mig;
+            return from mig in migrations
+                   where hashes.ContainsKey(mig.Version)
+                   let hash = hashes[mig.Version]
+                   where !string.Equals(hash, mig.Hash) select mig;
         }
 
         public IEnumerable<Migration> MigrationsSince(DateTime dateTime)

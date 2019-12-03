@@ -187,8 +187,33 @@ namespace Mite
             repo = migrator.DatabaseRepository;
 
             MigrationResult resultingVersion = null;
+            var dict = database.GetMigrationDictionary();
+
             switch (args[0])
             {
+                case "record":
+                    var migToRecord = migrator.Tracker.UnexcutedMigrations.FirstOrDefault(x => x.Version == args[1]);
+                    if (migToRecord != null)
+                    {
+                        repo.ForceWriteMigration(migToRecord);
+                        Console.WriteLine($"Recorded Migration [{migToRecord.Version}]: " + migToRecord.Hash);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Migration is already executed, use repair instead");
+                    }
+                    break;
+                case "repair":
+                    Console.WriteLine("Repairing");
+                    //update all the migration hash to the hash of the filesystem
+                    var invalidHashes = database.InvalidMigrations();
+                    foreach (var migration in invalidHashes)
+                    {
+                        var newVersion = dict[migration.Version];
+                        Console.WriteLine($"Updating Hash [{newVersion.Version}] to " + newVersion.Hash);
+                        repo.WriteHash(newVersion);
+                    }
+                    break;
                 case "update":
                     if (database.IsValidState())
                     {
