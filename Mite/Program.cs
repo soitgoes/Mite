@@ -200,7 +200,40 @@ namespace Mite
                     }
                     else
                     {
-                        Console.WriteLine("Migration is already executed, use repair instead");
+                        Console.WriteLine("Migration cannot be found");
+                    }
+                    break;
+                case "missing":
+                    var missingRecords = migrator.Tracker.UnexcutedMigrations.OrderBy(x => x.Version);
+                    foreach (var mig in missingRecords)
+                    {
+                        repo.ExecuteUp(mig);
+                        Console.WriteLine($"Recorded Migration [{mig.Version}]: " + mig.Hash);
+                    }
+                    break;
+                case "execute":
+                case "executeup":
+                    var migToExecute = migrator.Tracker.UnexcutedMigrations.FirstOrDefault(x => x.Version == args[1]);
+                    if (migToExecute != null)
+                    {
+                        repo.ExecuteUp(migToExecute);
+                        Console.WriteLine($"Recorded Migration [{migToExecute.Version}]: " + migToExecute.Hash);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Migration cannot be found");
+                    }
+                    break;  
+                case "executedown":
+                    var downToExe = migrator.Tracker.Migrations.FirstOrDefault(x => x.Version == args[1]);
+                    if (downToExe != null)
+                    {
+                        repo.ExecuteDown(downToExe);
+                        Console.WriteLine($"Recorded Migration [{downToExe.Version}]: " + downToExe.Hash);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Migration cannot be found");
                     }
                     break;
                 case "repair":
