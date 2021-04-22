@@ -117,6 +117,7 @@ namespace Mite.Core
             var version = tracker.Version;
             foreach (var mig in tracker.UnexcutedMigrations)
             {
+                Console.WriteLine("Executing: " + mig.Version);
                 databaseRepository.ExecuteUp(mig);
             }
             tracker = databaseRepository.Create();
@@ -124,8 +125,6 @@ namespace Mite.Core
         }
         public MigrationResult Update()
         {
-            if (!tracker.IsValidState())
-                throw new Exception("Database must be in a valid state in order to update it.");
             if (!databaseRepository.DatabaseExists())
                 databaseRepository.Init();
             var version = tracker.Version;
@@ -142,10 +141,7 @@ namespace Mite.Core
             
             string originalVersion = tracker.Version;
             bool isUp = tracker.Version.CompareTo(destinationVersion) < 0;
-            if (isUp && !tracker.IsValidState())
-                throw new Exception(
-                    "Database must be in a valid state in order to use migrate in the up direction.  Try mite update instead.");
-            if (!databaseRepository.MigrationTableExists())
+              if (!databaseRepository.MigrationTableExists())
                 databaseRepository.Init();
             var version = "";
             if (isUp)

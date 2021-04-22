@@ -264,8 +264,10 @@ namespace Mite
                     }
                     else if (database.IsMigrationGap())
                     {
-                        Console.WriteLine("There is a gap in your migrations how would you like to resolve it?");
-                        Resolve(migrator);
+                        //Console.WriteLine("There is a gap in your migrations how would you like to resolve it?");
+                        //Resolve(migrator);
+                        Console.WriteLine("Dirty Resolution...");
+                        migrator.DirtyResolution();
                     }
                     else if (database.IsHashMismatch())
                     {
