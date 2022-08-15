@@ -9,7 +9,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.13" />
+    <PackageReference Include="MySqlConnector" Version="2.1.12" />
   </ItemGroup>
 </Project>
 
