@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 
 namespace Mite.Core
@@ -33,5 +33,6 @@ namespace Mite.Core
         IDbConnection GetConnWithoutDatabaseSpecified();
         void WriteHash(Migration migration);
         void ForceWriteMigration(Migration migration);
+        void UpgradeMigrationTable();
     }
 }

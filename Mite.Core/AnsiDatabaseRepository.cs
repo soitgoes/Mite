@@ -275,5 +275,7 @@ namespace Mite.Core
             cmd.ExecuteNonQuery();
             connection.Close();
         }
+
+        public abstract void UpgradeMigrationTable();
     }
 }

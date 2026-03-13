@@ -75,6 +75,7 @@ namespace Mite
                 Console.WriteLine("update\t\tRuns all migrations greater than the current version");
                 Console.WriteLine("stepup\t\tExecutes one migration file greater than the current version");
                 Console.WriteLine("stepdown\tExecutes one migration file less than the current version");
+                Console.WriteLine("upgrade\t\tUpgrades the _migrations table to the latest schema");
                 Console.WriteLine("watch\t\tWatches for .sql file changes and auto-runs pending migrations");
 
                 return;
@@ -296,6 +297,11 @@ namespace Mite
                         File.Delete(currentDirectory);
                         Console.WriteLine("mite cleaned successfully");
                     }
+                    return;
+                case "upgrade":
+                    Console.WriteLine("Upgrading _migrations table schema...");
+                    repo.UpgradeMigrationTable();
+                    Console.WriteLine("Upgrade complete.");
                     return;
                 case "watch":
                     WatchMigrations(currentDirectory, connectionName);

@@ -41,8 +41,9 @@ BEGIN TRANSACTION
 GO
 CREATE TABLE dbo._migrations
 	(
-	[key] nvarchar(20) NOT NULL,
-	hash nvarchar(50) NOT NULL
+	[key] nvarchar(60) NOT NULL,
+	hash nvarchar(50) NOT NULL,
+	date_run datetime2 NOT NULL DEFAULT GETDATE()
 	)  ON [PRIMARY]
 GO
 ALTER TABLE dbo._migrations ADD CONSTRAINT
@@ -144,7 +145,7 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
         {
 
             var migrationCmd = (SqlCommand)connection.CreateCommand();
-            migrationCmd.CommandText = string.Format("insert into {0} VALUES(@key, @hash)", tableName);
+            migrationCmd.CommandText = string.Format("insert into {0} ([key], [hash]) VALUES(@key, @hash)", tableName);
             migrationCmd.Parameters.AddWithValue("@key", migration.Version);
             migrationCmd.Parameters.AddWithValue("@hash", migration.Hash);
             return migrationCmd;
@@ -193,6 +194,29 @@ select Has_Perms_By_Name(N'dbo._migrations', 'Object', 'ALTER') as ALT_Per, Has_
                 }
                 trans.Commit();
             }
+            connection.Close();
+        }
+
+        public override void UpgradeMigrationTable()
+        {
+            connection.Open();
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $@"
+                IF COL_LENGTH('dbo.{tableName}', 'date_run') IS NULL
+                BEGIN
+                    ALTER TABLE dbo.{tableName} ADD date_run datetime2 NOT NULL DEFAULT GETDATE();
+                END
+
+                DECLARE @max_len int;
+                SELECT @max_len = CHARACTER_MAXIMUM_LENGTH
+                  FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_NAME = '{tableName}' AND COLUMN_NAME = 'key';
+                IF @max_len < 60
+                BEGIN
+                    ALTER TABLE dbo.{tableName} ALTER COLUMN [key] nvarchar(60) NOT NULL;
+                END";
+            cmd.ExecuteNonQuery();
             connection.Close();
         }
 

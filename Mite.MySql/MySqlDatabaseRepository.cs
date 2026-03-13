@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -41,8 +41,9 @@ namespace Mite.MySql
         {
             var migrationTableScript =
                 @"CREATE  TABLE `_migrations` (
-  `key` VARCHAR(20) NOT NULL ,
+  `key` VARCHAR(60) NOT NULL ,
   `hash` VARCHAR(50) NOT NULL ,
+  `date_run` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`key`) ,
   UNIQUE INDEX `hash_UNIQUE` (`hash` ASC) );";
             this.connection.Open();
@@ -73,7 +74,7 @@ namespace Mite.MySql
         protected override IDbCommand GetMigrationCmd(Migration migration)
         {
             var migrationCmd = (MySqlCommand)connection.CreateCommand();
-            migrationCmd.CommandText = string.Format("insert into {0} VALUES(?key, ?hash)", tableName);
+            migrationCmd.CommandText = string.Format("insert into {0} (`key`, `hash`) VALUES(?key, ?hash)", tableName);
             migrationCmd.Parameters.AddWithValue("key", migration.Version);
             migrationCmd.Parameters.AddWithValue("hash", migration.Hash);
             return migrationCmd;
@@ -92,6 +93,35 @@ namespace Mite.MySql
             }
             this.connection.Close();
             return tables.Contains(tableName);
+        }
+
+        public override void UpgradeMigrationTable()
+        {
+            connection.Open();
+
+            var checkCol = connection.CreateCommand();
+            checkCol.CommandText = $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{tableName}' AND COLUMN_NAME = 'date_run'";
+            var hasDateRun = Convert.ToInt64(checkCol.ExecuteScalar()) > 0;
+
+            if (!hasDateRun)
+            {
+                var addCol = connection.CreateCommand();
+                addCol.CommandText = $"ALTER TABLE `{tableName}` ADD COLUMN `date_run` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP";
+                addCol.ExecuteNonQuery();
+            }
+
+            var checkLen = connection.CreateCommand();
+            checkLen.CommandText = $"SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{tableName}' AND COLUMN_NAME = 'key'";
+            var maxLen = Convert.ToInt64(checkLen.ExecuteScalar());
+
+            if (maxLen < 60)
+            {
+                var alterKey = connection.CreateCommand();
+                alterKey.CommandText = $"ALTER TABLE `{tableName}` MODIFY COLUMN `key` VARCHAR(60) NOT NULL";
+                alterKey.ExecuteNonQuery();
+            }
+
+            connection.Close();
         }
 
         public override string GenerateSqlScript(bool includeData)
