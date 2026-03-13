@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,8 +16,8 @@ namespace Mite.Core
             this.version = version;
             this.upSql = upSql;
             this.downSql = downSql;
-            var crypto = new SHA1CryptoServiceProvider();
-            this.hash = Convert.ToBase64String(crypto.ComputeHash(Encoding.UTF8.GetBytes(upSql + downSql))); 
+            using (var crypto = SHA1.Create())
+                this.hash = Convert.ToBase64String(crypto.ComputeHash(Encoding.UTF8.GetBytes(upSql + downSql))); 
         }
         public string Hash { get { return hash; } }
         public string Version { get { return version; } }

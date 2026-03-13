@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -249,7 +249,7 @@ namespace Mite.Core
                         cmd.ExecuteNonQuery();
                         result = true;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         result = false;
                     }
@@ -261,7 +261,7 @@ namespace Mite.Core
                 }
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return true; //assume it does and proceed.
             }
