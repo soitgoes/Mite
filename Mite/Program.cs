@@ -75,6 +75,7 @@ namespace Mite
                 Console.WriteLine("update\t\tRuns all migrations greater than the current version");
                 Console.WriteLine("stepup\t\tExecutes one migration file greater than the current version");
                 Console.WriteLine("stepdown\tExecutes one migration file less than the current version");
+                Console.WriteLine("set-default <name>\tSets the default named connection in mite.config");
                 Console.WriteLine("upgrade\t\tUpgrades the _migrations table to the latest schema");
                 Console.WriteLine("watch\t\tWatches for .sql file changes and auto-runs pending migrations");
 
@@ -114,6 +115,16 @@ namespace Mite
             if (args[0] == "init")
             {
                 InitConnection(args, connectionName);
+                return;
+            }
+            if (args[0] == "set-default")
+            {
+                if (args.Length < 2 || string.IsNullOrEmpty(args[1]))
+                {
+                    Console.WriteLine("Usage: mite set-default <name>");
+                    return;
+                }
+                SetDefaultConnection(args[1]);
                 return;
             }
 
@@ -426,6 +437,35 @@ namespace Mite
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Error: {ex.Message}");
                 Console.ResetColor();
             }
+        }
+
+        private static void SetDefaultConnection(string name)
+        {
+            var miteConfigPath = Path.Combine(currentDirectory, "mite.config");
+            if (!File.Exists(miteConfigPath))
+            {
+                Console.WriteLine("mite.config not found. Run 'mite init' first.");
+                return;
+            }
+
+            var root = JObject.Parse(File.ReadAllText(miteConfigPath));
+            var connections = root["connections"] as JObject;
+            if (connections == null)
+            {
+                Console.WriteLine("mite.config uses the legacy flat format. Named connections are required to set a default.");
+                return;
+            }
+
+            if (connections[name] == null)
+            {
+                var available = string.Join(", ", connections.Properties().Select(p => p.Name));
+                Console.WriteLine($"Connection '{name}' not found. Available: {available}");
+                return;
+            }
+
+            root["default"] = name;
+            File.WriteAllText(miteConfigPath, root.ToString(Formatting.Indented));
+            Console.WriteLine($"Default connection set to '{name}'.");
         }
 
         private static void InitConnection(string[] args, string connectionName)
