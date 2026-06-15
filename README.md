@@ -52,6 +52,49 @@ Use the following steps:
 * Use source control.  If you keep your migration scripts in the same repository as your source then you will always have the appropriate migrations in order to make your database current for that version.
 * Keep your scripts directory in a place that will not be published in a web accessible directory.  
 
+## mite.config
+
+`mite.config` is a JSON file in your scripts directory that tells Mite how to connect to your database.
+
+### Legacy format
+
+```json
+{
+  "repositoryName": "MySqlDatabaseRepository",
+  "connectionString": "Server=localhost;Database=mydb;Uid=user;Pwd=password",
+  "caCertificate": "certs/ca.pem"
+}
+```
+
+### Named connections
+
+When you have more than one database (for example, local and production), use named connections:
+
+```json
+{
+  "default": "local",
+  "connections": {
+    "local": {
+      "repositoryName": "MySqlDatabaseRepository",
+      "connectionString": "Server=localhost;Database=mydb;Uid=user;Pwd=password"
+    },
+    "production": {
+      "repositoryName": "MySqlDatabaseRepository",
+      "connectionString": "Server=db.example.com;Database=mydb;Uid=user;Pwd=password",
+      "caCertificate": "certs/production-ca.pem"
+    }
+  }
+}
+```
+
+Select a connection with `-n <name>`, or set `"default"` to choose one automatically.
+
+| Property | Required | Description |
+| --- | --- | --- |
+| `repositoryName` | Yes | `MySqlDatabaseRepository` or `MsSqlDatabaseRepository` |
+| `connectionString` | Yes | Standard .NET connection string for the provider |
+| `caCertificate` | No | Path to a PEM-encoded CA certificate file for MySQL SSL connections. Relative paths are resolved from the scripts directory. When set, Mite configures the connection to verify the server certificate against this CA (using `SslMode=VerifyCA` unless your connection string already specifies a stricter mode). |
+
 ## Migrating Up & Down
 * `mite stepup`  will execute one up migration.
 * `mite stepdown`  will execute one down migration.

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using Mite.Core;
 using MySqlConnector;
@@ -14,26 +15,47 @@ namespace Mite.MySql
         private string user;
         private string password;
 
-        public MySqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations")
+        public MySqlDatabaseRepository(string connectionString, string filePath):this(connectionString, filePath, "_migrations", null)
         {
         }
-        public MySqlDatabaseRepository (string connectionString, string filePath, string tableName)
+        public MySqlDatabaseRepository (string connectionString, string filePath, string tableName, string caCertificate = null)
         {
             this.filePath = filePath;
             this.tableName = tableName;
             this.delimiter = ";\n";
+            var effectiveConnectionString = ApplyCaCertificate(connectionString, caCertificate, filePath);
             var pattern = new Regex("(.*?)(UID|User Id)=(.*?);\\s*?(Password|Pwd)=(.*?)(;|$)", RegexOptions.IgnoreCase);
-            if (pattern.IsMatch(connectionString))
+            if (pattern.IsMatch(effectiveConnectionString))
             {
-                var matches = pattern.Matches(connectionString);
+                var matches = pattern.Matches(effectiveConnectionString);
                 user = matches[0].Groups[3].Value;
                 password = matches[0].Groups[5].Value;
             }else
             {
                 throw new Exception("Error parsing connection string using pattern: " + "(.*?)(UID|User Id)=(.*?);\\s*?(Password|Pwd)=(.*?)(;|$)");
             }
-            this.connectionString = connectionString;
-            this.connection = new MySqlConnection(connectionString);
+            this.connectionString = effectiveConnectionString;
+            this.connection = new MySqlConnection(effectiveConnectionString);
+        }
+
+        private static string ApplyCaCertificate(string connectionString, string caCertificate, string directoryPath)
+        {
+            if (string.IsNullOrEmpty(caCertificate))
+                return connectionString;
+
+            var caPath = Path.IsPathRooted(caCertificate)
+                ? caCertificate
+                : Path.Combine(directoryPath, caCertificate);
+
+            if (!File.Exists(caPath))
+                throw new Exception($"CA certificate not found: {caPath}");
+
+            var builder = new MySqlConnectionStringBuilder(connectionString);
+            builder.SslCa = caPath;
+            if (builder.SslMode == MySqlSslMode.Preferred || builder.SslMode == MySqlSslMode.None)
+                builder.SslMode = MySqlSslMode.VerifyCA;
+
+            return builder.ConnectionString;
         }
 
 

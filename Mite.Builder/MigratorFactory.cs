@@ -15,6 +15,7 @@ namespace Mite.Builder {
 
             string repoName;
             string connString;
+            string caCertificate = null;
 
             var connectionsToken = options["connections"];
             if (connectionsToken != null && connectionsToken.Type == JTokenType.Object)
@@ -40,6 +41,7 @@ namespace Mite.Builder {
 
                 repoName = conn.Value<string>("repositoryName");
                 connString = conn.Value<string>("connectionString");
+                caCertificate = conn.Value<string>("caCertificate");
             }
             else
             {
@@ -48,6 +50,7 @@ namespace Mite.Builder {
 
                 repoName = options.Value<string>("repositoryName");
                 connString = options.Value<string>("connectionString");
+                caCertificate = options.Value<string>("caCertificate");
             }
 
             if (string.IsNullOrEmpty(repoName)) {
@@ -61,7 +64,7 @@ namespace Mite.Builder {
             switch (repoName)
             {
                 case "MySqlDatabaseRepository":
-                    databaseRepository = new MySqlDatabaseRepository(connString, directoryPath);
+                    databaseRepository = new MySqlDatabaseRepository(connString, directoryPath, "_migrations", caCertificate);
                     break;
                 case "MsSqlDatabaseRepository":
                     databaseRepository = new MsSqlDatabaseRepository(connString, directoryPath);
